@@ -111,6 +111,7 @@ jobs:
 
       - name: Build with PyInstaller (Windows)
         if: matrix.target == 'windows'
+        shell: bash
         run: |
           pyinstaller --noconfirm --onedir --windowed --name "Sleekes" \
             --add-data "sleekes;sleekes" \
