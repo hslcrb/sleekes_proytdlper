@@ -1,0 +1,12 @@
+settings/
+venv/
+__pycache__/
+*.pyc
+.git
+.gitignore
+.DS_Store
+dist/
+build/
+*.spec
+README.md
+README_ko.md
