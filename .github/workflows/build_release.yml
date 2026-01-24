@@ -101,11 +101,19 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
           
-      - name: Build with PyInstaller
-        # onedir 모드 (--onedir) 사용, 리소스 포함
+      - name: Build with PyInstaller (Unix)
+        if: matrix.target != 'windows'
         run: |
           pyinstaller --noconfirm --onedir --windowed --name "Sleekes" \
             --add-data "sleekes:sleekes" \
+            --collect-all "yt_dlp" \
+            main.py
+
+      - name: Build with PyInstaller (Windows)
+        if: matrix.target == 'windows'
+        run: |
+          pyinstaller --noconfirm --onedir --windowed --name "Sleekes" \
+            --add-data "sleekes;sleekes" \
             --collect-all "yt_dlp" \
             main.py
             
