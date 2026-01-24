@@ -1,176 +1,64 @@
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+# 아파치 라이선스 (Apache License)
+버전 2.0, 2004년 1월
+http://www.apache.org/licenses/
 
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+사용, 복제 및 배포에 관한 약관 및 조건
 
-   1. Definitions.
+1. 정의.
 
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
+   "라이선스"란 본 문서의 제1조부터 제9조까지 정의된 사용, 복제 및 배포에 관한 약관 및 조건을 의미합니다.
 
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
+   "라이선스 제공자"란 라이선스를 부여하는 저작권 소유자 또는 저작권 소유자가 승인한 법인을 의미합니다.
 
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
+   "법적 실체"란 행위 실체와 그 실체를 지배하거나, 그 실체에 의해 지배받거나, 그 실체와 공통의 지배하에 있는 다른 모든 실체의 결합을 의미합니다. 이 정의의 목적상 "지배"란 (i) 계약 또는 기타 방법으로 해당 실체의 지시 또는 경영을 야기할 수 있는 직접적 또는 간접적 권한, 또는 (ii) 50% 이상의 발행 주식 소유권, 또는 (iii) 해당 실체의 실질적 소유권을 의미합니다.
 
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
+   "귀하"(또는 "귀하의")란 본 라이선스에 의해 부여된 권한을 행사하는 개인 또는 법적 실체를 의미합니다.
 
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
+   "소스" 형식이란 소프트웨어 소스 코드, 문서 소스 및 설정 파일을 포함하되 이에 국한되지 않는 수정을 위한 선호되는 형식을 의미합니다.
 
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
+   "객체" 형식이란 소스 형식의 기계적 변환 또는 번역으로 인해 발생하는 모든 형식을 의미하며, 컴파일된 객체 코드, 생성된 문서 및 다른 미디어 유형으로의 변환을 포함하되 이에 국한되지 않습니다.
 
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
+   "저작물"이란 본 라이선스에 따라 제공되는 저작물(소스 또는 객체 형식 불문)을 의미하며, 저작물에 포함되거나 첨부된 저작권 고지(아래 부록에 예시가 제공됨)에 표시됩니다.
 
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
+   "파생 저작물"이란 저작물에 기초하거나(또는 파생되거나) 편집 상의 수정, 주석, 정교화 또는 기타 수정이 전체적으로 원래 저작물을 대표하는 소스 또는 객체 형식의 모든 저작물을 의미합니다. 본 라이선스의 목적상 파생 저작물에는 저작물 및 그 파생 저작물의 인터페이스와 분리 가능하거나 단순히 이름으로 연결(또는 바인딩)되는 저작물은 포함되지 않습니다.
 
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
+   "기여"란 저작권 소유자 또는 저작권 소유자를 대신하여 제출할 권한이 있는 개인 또는 법적 실체가 라이선스 제공자에게 저작물에 포함시키기 위해 의도적으로 제출한 저작물의 원본 버전 및 해당 저작물 또는 파생 저작물의 수정 또는 추가를 포함한 모든 저작물을 의미합니다. 이 정의의 목적상 "제출된"이란 라이선스 제공자 또는 그 대리인에게 전송된 전자적, 구두 또는 서면 통신의 모든 형태를 의미합니다. 여기에는 작업의 논의 및 개선을 목적으로 라이선스 제공자가 관리하거나 라이선스 제공자를 대신하여 관리되는 전자 메일 목록, 소스 코드 제어 시스템 및 이슈 추적 시스템에 대한 통신이 포함되지만, 저작권 소유자가 "기여 아님"이라고 명시적으로 표시하거나 지정한 통신은 제외됩니다.
 
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
+   "기여자"란 라이선스 제공자 및 라이선스 제공자가 기여를 수신하고 이후 저작물에 통합한 개인 또는 법적 실체를 의미합니다.
 
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
+2. 저작권 라이선스 부여. 본 라이선스의 조건에 따라, 각 기여자는 귀하에게 저작물 및 파생 저작물을 소스 또는 객체 형식으로 복제, 파생 저작물 작성, 공개 표시, 공개 공연, 하위 라이선스 부여 및 배포할 수 있는 영구적이고, 전 세계적이며, 비독점적이고, 무료이며, 사용료 없는, 취소 불가능한 저작권 라이선스를 부여합니다.
 
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
+3. 특허 라이선스 부여. 본 라이선스의 조건에 따라, 각 기여자는 귀하에게 본 조항에 명시된 경우를 제외하고 저작물을 제작, 제작 의뢰, 사용, 판매 청약, 판매, 수입 및 기타 방식으로 양도할 수 있는 영구적이고, 전 세계적이며, 비독점적이고, 무료이며, 사용료 없는, 취소 불가능한 특허 라이선스를 부여합니다.
 
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
+4. 배포. 귀하는 저작물 또는 파생 저작물의 사본을 수정 여부와 관계없이 소스 또는 객체 형식으로 모든 매체에 복제하고 배포할 수 있습니다. 단, 귀하는 다음 조건을 충족해야 합니다.
 
-      (a) You must give any other recipients of the Work or Derivative
-          Works a copy of this License; and
+   (a) 귀하는 저작물 또는 파생 저작물의 다른 수령인에게 본 라이선스의 사본을 제공해야 합니다.
+   (b) 귀하는 수정된 파일에 귀하가 파일을 변경했음을 명시하는 눈에 띄는 고지를 포함해야 합니다.
+   (c) 귀하는 배포하는 파생 저작물의 소스 형식에 저작물의 소스 형식에 있는 모든 저작권, 특허, 상표 및 귀속 고지를 유지해야 합니다. 단, 파생 저작물의 어떠한 부분과도 관련이 없는 고지는 제외합니다.
 
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
+5. 기여 제출. 귀하가 달리 명시하지 않는 한, 귀하가 라이선스 제공자에게 저작물에 포함시키기 위해 의도적으로 제출한 기여는 추가적인 조건 없이 본 라이선스의 조건을 따릅니다.
 
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
+6. 상표. 본 라이선스는 라이선스 제공자의 상호, 상표, 서비스표 또는 제품명을 사용할 권한을 부여하지 않습니다. 단, 저작물의 출처를 설명하거나 NOTICE 파일의 내용을 재생산하는 데 필요한 합리적이고 관습적인 사용은 예외로 합니다.
 
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
+7. 보증 부인. 관련 법률에서 요구하거나 서면으로 합의하지 않는 한, 라이선스 제공자는 저작물을 "있는 그대로" 제공하며,상품성, 특정 목적에의 적합성 등에 대한 묵시적 보증을 포함하여 어떠한 종류의 보증도 하지 않습니다.
 
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
+8. 책임 제한. 관련 법률에서 요구하거나 서면으로 합의하지 않는 한, 어떠한 경우에도 기여자는 귀하에게 발생한 손해에 대해 책임을 지지 않습니다.
 
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
+9. 보증 또는 추가 책임 수락. 귀하는 저작물 또는 파생 저작물을 배포할 때 지원, 보증, 면책 또는 기타 책임 의무 및/또는 권리를 제공하고 그에 대한 수수료를 청구할 수 있습니다.
 
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
+약관 및 조건의 끝
 
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
+---
+Copyright 2008-2026 Rheehose (Rhee Creative)
 
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-   END OF TERMS AND CONDITIONS
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

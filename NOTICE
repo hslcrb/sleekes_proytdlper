@@ -1,34 +1,30 @@
 Sleekes: Potent. Pure. Permanent.
-Copyright (c) 2026 Sleekes Contributors & Antigravity
+Copyright (c) 2008-2026 Rheehose (Rhee Creative) & Contributors
 
-This product includes software developed at
-Sleekes Project (https://github.com/hslcrb/sleekes_proytdlper).
+본 제품에는 Sleekes Project(https://github.com/hslcrb/sleekes_proytdlper)에서 개발한 소프트웨어가 포함되어 있습니다.
 
 ================================================================
-THIRD-PARTY SOFTWARE NOTICES
+THIRD-PARTY SOFTWARE NOTICES (제3자 소프트웨어 고지)
 ================================================================
 
-This software currently uses the following third-party libraries and tools:
+본 소프트웨어는 다음의 제3자 오픈소스 라이브러리 및 도구를 사용합니다:
 
 1. yt-dlp (The Unlicense - Public Domain)
-   - Usage: Core video downloading and metadata extraction engine.
-   - License: https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE
-   - Source: https://github.com/yt-dlp/yt-dlp
+   - 용도: 핵심 동영상 다운로드 및 메타데이터 추출 엔진
+   - 라이선스: https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE
+   - 소스코드: https://github.com/yt-dlp/yt-dlp
 
 2. PySide6 (LGPL v3 / GPL v2)
-   - Usage: Provides the Graphical User Interface (GUI).
-   - License: https://doc.qt.io/qtforpython/licenses.html
-   - Source: https://code.qt.io/cgit/pyside/pyside-setup.git
-   - Note: This software is dynamically linked with the Qt library. 
-     Users may modify and relink the Qt library used by this application 
-     in accordance with the LGPL v3 license terms.
+   - 용도: 그래픽 사용자 인터페이스(GUI) 제공
+   - 라이선스: https://doc.qt.io/qtforpython/licenses.html
+   - 소스코드: https://code.qt.io/cgit/pyside/pyside-setup.git
+   - 고지: 본 소프트웨어는 Qt 라이브러리와 동적으로 링크됩니다. 
+     사용자는 LGPL v3 라이선스 조건에 따라 본 애플리케이션에 사용된 Qt 라이브러리를 수정하고 다시 링크할 권한이 있습니다.
 
 3. FFmpeg (LGPL v2.1+ / GPL v2+)
-   - Usage: Optional dependency for video/audio conversion and merging.
-   - License: https://ffmpeg.org/legal.html
-   - Source: https://ffmpeg.org/download.html
-   - Note: FFmpeg is invoked as an external subprocess or linked dynamically. 
-     If compiled with GPL options (e.g., x264), the resulting binary may be subject to GPL terms. 
-     Sleekes does not distribute FFmpeg binaries directly but relies on system installations or user-provided binaries.
+   - 용도: 비디오/오디오 변환 및 병합을 위한 선택적 의존성
+   - 라이선스: https://ffmpeg.org/legal.html
+   - 소스코드: https://ffmpeg.org/download.html
+   - 고지: Sleekes는 FFmpeg 바이너리를 직접 포함하여 배포하지 않으며, 사용자의 시스템에 설치된 버전을 사용하거나 별도로 다운로드하여 사용합니다.
 
 ================================================================
