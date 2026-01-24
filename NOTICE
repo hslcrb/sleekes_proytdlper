@@ -1,0 +1,34 @@
+Sleekes: Potent. Pure. Permanent.
+Copyright (c) 2026 Sleekes Contributors & Antigravity
+
+This product includes software developed at
+Sleekes Project (https://github.com/hslcrb/sleekes_proytdlper).
+
+================================================================
+THIRD-PARTY SOFTWARE NOTICES
+================================================================
+
+This software currently uses the following third-party libraries and tools:
+
+1. yt-dlp (The Unlicense - Public Domain)
+   - Usage: Core video downloading and metadata extraction engine.
+   - License: https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE
+   - Source: https://github.com/yt-dlp/yt-dlp
+
+2. PySide6 (LGPL v3 / GPL v2)
+   - Usage: Provides the Graphical User Interface (GUI).
+   - License: https://doc.qt.io/qtforpython/licenses.html
+   - Source: https://code.qt.io/cgit/pyside/pyside-setup.git
+   - Note: This software is dynamically linked with the Qt library. 
+     Users may modify and relink the Qt library used by this application 
+     in accordance with the LGPL v3 license terms.
+
+3. FFmpeg (LGPL v2.1+ / GPL v2+)
+   - Usage: Optional dependency for video/audio conversion and merging.
+   - License: https://ffmpeg.org/legal.html
+   - Source: https://ffmpeg.org/download.html
+   - Note: FFmpeg is invoked as an external subprocess or linked dynamically. 
+     If compiled with GPL options (e.g., x264), the resulting binary may be subject to GPL terms. 
+     Sleekes does not distribute FFmpeg binaries directly but relies on system installations or user-provided binaries.
+
+================================================================
