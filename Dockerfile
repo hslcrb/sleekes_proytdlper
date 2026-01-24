@@ -2,12 +2,16 @@ FROM python:3.10
 
 WORKDIR /app
 
-# 시스템 의존성 설치 (ffmpeg 및 필수 라이브러리)
-# full 이미지에는 대부분의 라이브러리가 포함되어 있으나, ffmpeg와 일부 GL 라이브러리는 명시 필요
+# 시스템 의존성 설치 (ffmpeg 및 PySide6 필수 라이브러리)
+# Debian Bookworm 대응 패키지명 사용
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    libgl1-mesa-glx \
+    libgl1 \
+    libxkbcommon-x11-0 \
+    libegl1 \
+    libdbus-1-3 \
     && rm -rf /var/lib/apt/lists/*
+
 
 # 요구사항 복사 및 설치
 COPY requirements.txt .
