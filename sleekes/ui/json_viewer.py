@@ -211,45 +211,58 @@ class JsonViewerWidget(QWidget):
         # 썸네일
         thumb_url = data.get('thumbnail', '')
         
-        # 댓글 (상위 50개만 표시 등)
+        # 댓글 처리 (제한 없이 전체 표시)
         comments_html = ""
         if 'comments' in data and isinstance(data['comments'], list):
             count = len(data['comments'])
-            comments_html += f"<h3>💬 Comments ({count})</h3>"
-            for c in data['comments'][:30]: # 성능을 위해 상위 30개만
+            comments_html += f"<h3>💬 전체 댓글 ({count})</h3>"
+            
+            for c in data['comments']:
                 author = html.escape(c.get('author', 'Anonymous'))
+                # 타임스탬프가 있다면 변환 (선택 사항)
+                
                 text = html.escape(c.get('text', '')).replace('\n', '<br>')
+                
+                # 부모 댓글 렌더링
                 comments_html += f"""
                 <div style="margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">
-                    <b style="color: #7dd3fc;">{author}</b><br>
+                    <b style="color: #7dd3fc; font-size: 14px;">{author}</b><br>
                     <span style="color: #cbd5e1;">{text}</span>
                 </div>
                 """
-            if count > 30:
-                comments_html += f"<p style='color: #64748b;'>...외 {count - 30}개의 댓글이 더 있습니다. (전체 보기는 '소스 보기' 이용)</p>"
+                
+                # 대댓글(답글)이 있는 경우 재귀적으로는 아니더라도 리스트가 있다면 표시
+                # yt-dlp 구조상 대댓글은 보통 같은 리스트에 parent_id 등으로 있거나 별도 구조일 수 있음
+                # 하지만 yt-dlp 표준 출력에서는 comments 리스트 안에 모두 평탄화되어 있거나, 계층형일 수 있음.
+                # 여기서는 'replies' 키가 있는 경우를 가정하거나, 단순히 리스트 전체를 순회.
+                # 만약 yt-dlp가 flat하게 준다면 위 루프에서 다 나오지만, 
+                # 계층 구조 보장을 위해 확인 필요. 보통은 flat하게 줌.
 
         return f"""
         <style>
-            body {{ color: #e2e8f0; font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; }}
-            h1 {{ color: #38bdf8; font-size: 24px; margin-bottom: 5px; }}
+            body {{ color: #e2e8f0; font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; line-height: 1.6; }}
+            h1 {{ color: #38bdf8; font-size: 26px; margin-bottom: 5px; border-bottom: 2px solid #38bdf8; padding-bottom: 10px; }}
             .meta {{ color: #94a3b8; font-size: 13px; margin-bottom: 20px; }}
-            .box {{ background-color: rgba(30, 41, 59, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 20px; }}
+            .box {{ background-color: rgba(30, 41, 59, 0.5); padding: 20px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 30px; }}
             .label {{ color: #7dd3fc; font-weight: bold; margin-right: 5px; }}
-            a {{ color: #38bdf8; text-decoration: none; }}
+            a {{ color: #38bdf8; text-decoration: none; font-weight: bold; }}
+            a:hover {{ text-decoration: underline; }}
             hr {{ border: 0; border-top: 1px solid #334155; margin: 20px 0; }}
         </style>
         
         <h1>{html.escape(title)}</h1>
         <div class="meta">
-            <span class="label">Uploader:</span> {uploader} &nbsp;|&nbsp; 
-            <span class="label">Date:</span> {upload_date} &nbsp;|&nbsp; 
-            <span class="label">Views:</span> {view_count} &nbsp;|&nbsp; 
-            <span class="label">Likes:</span> {like_count}
+            <span class="label">📅 업로드:</span> {upload_date} &nbsp;|&nbsp; 
+            <span class="label">👤 게시자:</span> {uploader} &nbsp;|&nbsp; 
+            <span class="label">👁️ 조회수:</span> {view_count} &nbsp;|&nbsp; 
+            <span class="label">👍 좋아요:</span> {like_count}
         </div>
 
+        <h3>📝 설명</h3>
         <div class="box">
             {desc}
         </div>
 
         {comments_html}
         """
+
