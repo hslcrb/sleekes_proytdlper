@@ -211,32 +211,86 @@ class JsonViewerWidget(QWidget):
         # 썸네일
         thumb_url = data.get('thumbnail', '')
         
-        # 댓글 처리 (제한 없이 전체 표시)
+        # 댓글 처리 (계층 구조 렌더링)
         comments_html = ""
         if 'comments' in data and isinstance(data['comments'], list):
-            count = len(data['comments'])
-            comments_html += f"<h3>💬 전체 댓글 ({count})</h3>"
+            comments_list = data['comments']
+            count = len(comments_list)
             
-            for c in data['comments']:
-                author = html.escape(c.get('author', 'Anonymous'))
-                # 타임스탬프가 있다면 변환 (선택 사항)
+            # 1. 트리 구조 빌드
+            # id를 키로 하는 맵 생성
+            comment_map = {}
+            children_map = {} # parent_id -> [child_comments...]
+            root_comments = []
+
+            for c in comments_list:
+                c_id = c.get('id')
+                if not c_id: continue
+                comment_map[c_id] = c
                 
-                text = html.escape(c.get('text', '')).replace('\n', '<br>')
+                parent_id = c.get('parent')
+                # parent가 없거나 'root'인 경우 최상위 댓글
+                if not parent_id or parent_id == 'root':
+                    root_comments.append(c)
+                else:
+                    if parent_id not in children_map:
+                        children_map[parent_id] = []
+                    children_map[parent_id].append(c)
+
+            comments_html += f"<h3>💬 전체 댓글 ({count})</h3>"
+
+            # 2. 재귀 렌더링 함수
+            def render_comment_recursive(comment, depth=0):
+                c_id = comment.get('id')
+                author = html.escape(comment.get('author', 'Anonymous'))
+                raw_text = comment.get('text', '')
+                text = html.escape(raw_text).replace('\n', '<br>')
                 
-                # 부모 댓글 렌더링
-                comments_html += f"""
-                <div style="margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">
-                    <b style="color: #7dd3fc; font-size: 14px;">{author}</b><br>
-                    <span style="color: #cbd5e1;">{text}</span>
+                # 스타일 계산
+                margin_left = depth * 40
+                if margin_left > 0: # 대댓글 스타일
+                    box_style = f"margin-left: {margin_left}px; border-left: 3px solid #38bdf8; padding-left: 15px; background-color: rgba(56, 189, 248, 0.05);"
+                    prefix = "↳ "
+                else: # 최상위 댓글 스타일
+                    box_style = "border-bottom: 1px solid #334155; padding-bottom: 10px;"
+                    prefix = ""
+                
+                # 댓글 HTML 생성
+                item_html = f"""
+                <div style="margin-bottom: 15px; {box_style}">
+                    <div style="font-size: 14px; margin-bottom: 4px;">
+                        <span style="color: #94a3b8;">{prefix}</span>
+                        <b style="color: #7dd3fc;">{author}</b>
+                        <span style="color: #64748b; font-size: 12px; margin-left:10px;">({comment.get('like_count', 0)} likes)</span>
+                    </div>
+                    <span style="color: #e2e8f0; line-height: 1.5;">{text}</span>
                 </div>
                 """
                 
-                # 대댓글(답글)이 있는 경우 재귀적으로는 아니더라도 리스트가 있다면 표시
-                # yt-dlp 구조상 대댓글은 보통 같은 리스트에 parent_id 등으로 있거나 별도 구조일 수 있음
-                # 하지만 yt-dlp 표준 출력에서는 comments 리스트 안에 모두 평탄화되어 있거나, 계층형일 수 있음.
-                # 여기서는 'replies' 키가 있는 경우를 가정하거나, 단순히 리스트 전체를 순회.
-                # 만약 yt-dlp가 flat하게 준다면 위 루프에서 다 나오지만, 
-                # 계층 구조 보장을 위해 확인 필요. 보통은 flat하게 줌.
+                # 자식(대댓글)이 있다면 재귀 호출
+                if c_id in children_map:
+                    # 날짜순 정렬 등을 할 수도 있지만, 여기선 리스트 순서대로
+                    for child in children_map[c_id]:
+                        item_html += render_comment_recursive(child, depth + 1)
+                
+                return item_html
+
+            # 3. 루트 댓글부터 순회하며 렌더링
+            for root in root_comments:
+                comments_html += render_comment_recursive(root)
+
+            # 만약 댓글 구조가 트리형이 아니고 플랫한데 parent 정보가 없는 경우 (예: 구버전 데이터)
+            if not root_comments and comments_list:
+                 comments_html += "<p style='color: #fbbf24;'>⚠️ 계층 구조 정보를 찾을 수 없어 리스트로 표시합니다.</p>"
+                 for c in comments_list:
+                    author = html.escape(c.get('author', 'Anonymous'))
+                    text = html.escape(c.get('text', '')).replace('\n', '<br>')
+                    comments_html += f"""
+                    <div style="margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+                        <b style="color: #7dd3fc;">{author}</b><br>
+                        <span style="color: #cbd5e1;">{text}</span>
+                    </div>
+                    """
 
         return f"""
         <style>
@@ -265,4 +319,5 @@ class JsonViewerWidget(QWidget):
 
         {comments_html}
         """
+
 
