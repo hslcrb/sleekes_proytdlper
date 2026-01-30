@@ -204,10 +204,10 @@ class SleekesMainWindow(QMainWindow):
         adv_layout = QHBoxLayout()
         
         # 휴식 시간 (Anti-Ban)
-        adv_layout.addWidget(QLabel("휴식(초):"))
+        adv_layout.addWidget(QLabel("휴식(분):"))
         self.sleep_input = QLineEdit()
-        self.sleep_input.setToolTip("영상 다운로드 사이의 대기 시간(초). IP 차단 방지용.")
-        self.sleep_input.setMaximumWidth(50)
+        self.sleep_input.setToolTip("영상/데이터 요청 사이의 휴식 시간(분). 소수점 가능 (예: 0.5는 30초).")
+        self.sleep_input.setMaximumWidth(60)
         self.sleep_input.setAlignment(Qt.AlignCenter)
         adv_layout.addWidget(self.sleep_input)
 
@@ -276,7 +276,7 @@ class SleekesMainWindow(QMainWindow):
         self.audio_mode_cb.setChecked(s.get("only_audio", False))
         self.skip_download_cb.setChecked(s.get("skip_download", False))
         self.stealth_mode_cb.setChecked(s.get("stealth_mode", True)) # 기본적으로 켜둠 (안전제일)
-        self.sleep_input.setText(str(s.get("sleep_interval", 15)))
+        self.sleep_input.setText(str(s.get("sleep_interval_min", 1.0))) # 분 단위 기본값
         
         # 콤보박스 텍스트로 인덱스 찾아 설정
         cb_idx = self.cookie_browser.findText(s.get("cookie_browser", "None"))
@@ -301,16 +301,16 @@ class SleekesMainWindow(QMainWindow):
         프로그램 종료 시나 작업 시작 시 호출됩니다.
         """
         try:
-            sleep_val = int(self.sleep_input.text())
+            sleep_min = float(self.sleep_input.text())
         except:
-            sleep_val = 5 # 예외 발생 시 기본값 5
+            sleep_min = 1.0 # 예외 발생 시 기본값 1분
 
         self.settings.update({
             "archive_mode": self.archive_mode_cb.isChecked(),
             "only_audio": self.audio_mode_cb.isChecked(),
             "skip_download": self.skip_download_cb.isChecked(),
             "stealth_mode": self.stealth_mode_cb.isChecked(),
-            "sleep_interval": sleep_val,
+            "sleep_interval_min": sleep_min,
             "cookie_browser": self.cookie_browser.currentText(),
             "flat_output": self.flat_output_cb.isChecked(),
             "last_path": self.path_input.text()
@@ -326,11 +326,11 @@ class SleekesMainWindow(QMainWindow):
         self.stealth_mode_cb.setChecked(True)   # 스텔스 모드 (403 방어) 켜기
         self.audio_mode_cb.setChecked(False)   # 오디오 전용 끄기
         self.skip_download_cb.setChecked(False)# 영상 생략 끄기
-        self.sleep_input.setText("15")         # 15초(최대 30초) 랜덤 휴식 설정
+        self.sleep_input.setText("1.0")        # 1분(최대 2분) 랜덤 휴식 설정
         self.flat_output_cb.setChecked(False)  # 폴더 정리 켜기
-        self.cookie_browser.setCurrentText("None") # 쿠키 제외 (요청사항)
-        self.add_log("💡 채널 보존을 위한 [안전 아카이빙 + 스텔스 모드]가 적용되었습니다.")
-        self.add_log("   (속도는 조금 느리지만 차단 위험을 최소화합니다.)")
+        self.cookie_browser.setCurrentText("None") # 쿠키 제외
+        self.add_log("💡 안전 아카이빙 [1분 대기 + 스텔스 모드]가 적용되었습니다.")
+        self.add_log("   (영상/데이터 요청 사이에 충분히 휴식하여 차단을 회피합니다.)")
 
     def toggle_archive_options(self, checked):
         """
@@ -361,11 +361,11 @@ class SleekesMainWindow(QMainWindow):
 
         self.save_current_settings() # 작업 전 설정 자동 저장
 
-        # 휴식 시간 파싱
+        # 휴식 시간 파싱 (분을 초로 변환)
         try:
-            sleep_val = int(self.sleep_input.text())
+            sleep_sec = float(self.sleep_input.text()) * 60.0
         except:
-            sleep_val = 0
+            sleep_sec = 60.0
 
         # 쿠키 브라우저
         cookie_b = self.cookie_browser.currentText()
@@ -386,10 +386,10 @@ class SleekesMainWindow(QMainWindow):
             'only_audio': self.audio_mode_cb.isChecked(),
             'skip_download': self.skip_download_cb.isChecked(),
             
-            # Anti-ban sleep settings
-            'max_sleep_interval': sleep_val * 2 if sleep_val > 0 else 30, # 최소 30초 랜덤성 확보
-            'sleep_interval': sleep_val,
-            'sleep_requests': 5 if self.stealth_mode_cb.isChecked() else 0, # 요청마다 5초 대기
+            # Anti-ban sleep settings (강력한 랜덤 범위: 설정값 ~ 설정값*2)
+            'max_sleep_interval': sleep_sec * 2.0,
+            'sleep_interval': sleep_sec,
+            'sleep_requests': sleep_sec / 2.0 if self.stealth_mode_cb.isChecked() else 0, # 요청 단계별 지연 보완
             
             'stealth_mode': self.stealth_mode_cb.isChecked(),
             'cookies_from_browser': cookie_b,
