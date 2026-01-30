@@ -1,42 +1,38 @@
 # Contributing to Sleekes
 
-Thank you for your interest in contributing to Sleekes. We value contributions that maintain the project's core principles: Potency, Purity, and Permanence.
-
-## 1. How to Contribute
-
-### Bug Reports
-If you encounter an issue, please report it via GitHub Issues with:
-- OS Version and Sleekes build version.
-- Detailed log output (Achromatic logs).
-- Steps to reproduce the error.
-
-### Feature Proposals
-We welcome ideas for new features that align with the minimalist aesthetic.
-- Describe the feature clearly.
-- Explain how it enhances the archiving experience without adding unnecessary clutter.
-
-### Code Contributions
-1. **Fork** the repository.
-2. Create a new branch (`git checkout -b feature/NewFeature`).
-3. Commit your changes (`git commit -m 'Add NewFeature'`).
-4. Push to your branch (`git push origin feature/NewFeature`).
-5. Create a **Pull Request**.
-
-## 2. Design & Coding Standards
-
-### Achromatic Aesthetic
-Sleekes follows a strict achromatic (non-color) design language. 
-- Avoid using colored assets or emojis in the UI or documentation.
-- Use the provided `icons.py` SVG system for all visual indicators.
-- Maintain high contrast and minimalist layouts.
-
-### Implementation
-- **Python**: Adhere to PEP 8 standards.
-- **Type Hinting**: Required for all new functions and classes.
-- **Documentation**: Use clear, technical English or Korean for comments and documentation updates.
-
-## 3. License
-By contributing to this project, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
+[English](#english) | [한국어](#한국어)
 
 ---
-*Sleekes Development Team*
+
+## English
+
+Thank you for your interest in contributing to Sleekes. We value contributions that maintain the project's core principles: **Potency, Purity, and Permanence**.
+
+### 1. How to Contribute
+- **Bug Reports**: Report via GitHub Issues with OS version, logs, and reproduction steps.
+- **Feature Proposals**: Ideas that align with the minimalist aesthetic are always welcome.
+- **Pull Requests**: Fork, create a feature branch, and submit your PR for review.
+
+### 2. Design Standards
+- **Achromatic Aesthetic**: No colors or emojis in UI or documentation.
+- **SVG System**: Use the `icons.py` system for all visual indicators.
+- **Python**: Adhere to PEP 8 with mandatory type hinting.
+
+---
+
+## 한국어
+
+Sleekes 프로젝트에 관심을 가져주셔서 감사합니다. 우리는 프로젝트의 핵심 원칙인 **Potency(강력함), Purity(순수함), Permanence(영구성)**를 유지하는 기여를 환영합니다.
+
+### 1. 기여 방법
+- **버그 신고**: OS 버전, 로그, 재현 단계를 포함하여 GitHub Issues에 제보해주세요.
+- **기능 제안**: 미니멀리즘 미학에 부합하는 아이디어라면 언제든 환영합니다.
+- **코드 기여**: 저장소를 Fork하고, 기능 브랜치를 생성한 뒤 Pull Request를 제출해주세요.
+
+### 2. 디자인 표준
+- **무채색 미학**: UI 및 문서에서 색상이나 이모지를 사용하지 않습니다.
+- **SVG 시스템**: 모든 시각적 지표에는 `icons.py`의 SVG 시스템을 사용합니다.
+- **Python**: PEP 8 표준을 준수하며, 모든 함수에 타입 힌트를 작성해야 합니다.
+
+---
+*By contributing, you agree that your code will be licensed under the Apache License 2.0.*

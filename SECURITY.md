@@ -1,33 +1,30 @@
 # Security Policy
 
-## Supported Versions
+[English](#english) | [한국어](#한국어)
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+---
 
-## Reporting a Vulnerability
+## English
 
-Security is a core pillar of the Sleekes project. If you find a security vulnerability, please do not disclose it publicly. Instead, report it directly to the maintainers.
+### Reporting a Vulnerability
+Security is a core pillar of Sleekes. If you find a vulnerability, please report it via private disclosure to the maintainers.
 
-### IP Exposure & Anti-Ban
-Sleekes includes advanced measures to protect your IP from being flagged as a bot by major platforms. These include:
-- **Mobile Emulation**: Spoofing request headers to appear as a legitimate mobile client (Android/iOS).
-- **UA Rotation**: Dynamic switching of browser identities.
-- **Randomized Throttling**: Variable sleep intervals to mimic human behavior.
+### IP Protection
+Sleekes includes advanced measures:
+- **Mobile Emulation**: Spoofing requests as Android/iOS clients to mitigate 403 errors.
+- **Randomized Throttling**: Variable sleep intervals to mimic human usage.
 
-If you discover a way these measures can be bypassed or manipulated to expose user data or risk IP safety, please report it immediately.
+---
 
-### Data Privacy
-Sleekes is a local-first application. 
-- No metadata or personal information is transmitted to external servers.
-- Auth cookies are used only locally to communicate with the target platform.
+## 한국어
 
-## Response Process
-1. Acknowledgment within 48 hours.
-2. Draft fix prepared for testing.
-3. Coordinated public disclosure after the fix is merged.
+### 취약점 신고
+보안은 Sleekes의 핵심 축입니다. 취약점을 발견하신 경우 공개적으로 노출하지 마시고, 메인테이너에게 비공개로 제보해 주세요.
+
+### IP 보호 및 차단 방어
+Sleekes는 다음의 고도화된 보호 조치를 포함합니다:
+- **모바일 에뮬레이션**: 403 오류를 완화하기 위해 요청을 안드로이드/iOS 클라이언트로 위장합니다.
+- **무작위 지연**: 사람의 행동을 모방하기 위해 변동적인 휴식(Sleep) 간격을 적용합니다.
 
 ---
 *Stay Pure. Stay Secure.*
