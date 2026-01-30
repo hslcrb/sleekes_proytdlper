@@ -326,11 +326,11 @@ class SleekesMainWindow(QMainWindow):
         self.stealth_mode_cb.setChecked(True)   # 스텔스 모드 (403 방어) 켜기
         self.audio_mode_cb.setChecked(False)   # 오디오 전용 끄기
         self.skip_download_cb.setChecked(False)# 영상 생략 끄기
-        self.sleep_input.setText("1.0")        # 1분(최대 2분) 랜덤 휴식 설정
+        self.sleep_input.setText("5.0")        # 최소 5분 자동 세팅
         self.flat_output_cb.setChecked(False)  # 폴더 정리 켜기
         self.cookie_browser.setCurrentText("None") # 쿠키 제외
-        self.add_log("💡 안전 아카이빙 [1분 대기 + 스텔스 모드]가 적용되었습니다.")
-        self.add_log("   (영상/데이터 요청 사이에 충분히 휴식하여 차단을 회피합니다.)")
+        self.add_log("💡 초강력 [채널 보존 모드] 적용: 최소 5분 ~ 최대 30분 랜덤 대기")
+        self.add_log("   (이 설정은 유튜브 차단을 피하기 위한 가장 강력한 방패입니다.)")
 
     def toggle_archive_options(self, checked):
         """
@@ -386,10 +386,10 @@ class SleekesMainWindow(QMainWindow):
             'only_audio': self.audio_mode_cb.isChecked(),
             'skip_download': self.skip_download_cb.isChecked(),
             
-            # Anti-ban sleep settings (강력한 랜덤 범위: 설정값 ~ 설정값*2)
-            'max_sleep_interval': sleep_sec * 2.0,
+            # Anti-ban sleep settings (최소 설정값 ~ 최대 30분 랜덤)
+            'max_sleep_interval': max(sleep_sec * 2.0, 1800.0) if self.stealth_mode_cb.isChecked() else sleep_sec * 2,
             'sleep_interval': sleep_sec,
-            'sleep_requests': sleep_sec / 2.0 if self.stealth_mode_cb.isChecked() else 0, # 요청 단계별 지연 보완
+            'sleep_requests': min(sleep_sec / 2.0, 300.0) if self.stealth_mode_cb.isChecked() else 0, 
             
             'stealth_mode': self.stealth_mode_cb.isChecked(),
             'cookies_from_browser': cookie_b,
