@@ -1,55 +1,32 @@
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QLineEdit, QPushButton, QLabel, QCheckBox, 
-                             QTextEdit, QProgressBar, QFileDialog, QGroupBox, QTabWidget, QMessageBox)
-from PySide6.QtCore import Qt, QThread, Signal, Slot
+                             QTextEdit, QProgressBar, QFileDialog, QGroupBox, QTabWidget, QMessageBox, QComboBox)
+from PySide6.QtCore import Qt, QThread, Signal, Slot, QSize
 from PySide6.QtGui import QIcon, QFont, QAction
 from sleekes.core.downloader import SleekesDownloader
 from sleekes.core.config import load_settings, save_settings
-from sleekes.ui.styles import MAIN_STYLE
+from sleekes.ui import styles, icons
 from sleekes.ui.json_viewer import JsonViewerWidget
 from sleekes.ui.guide_view import GuideViewWidget
 import os
 
 # =============================================================================
-# [Sleekes Main Window]
-#
-# 이 모듈은 Sleekes의 GUI(Graphical User Interface) 메인 윈도우를 정의합니다.
-# PySide6(Qt)를 사용하여 모던하고 직관적인 사용자 경험을 제공합니다.
-# 
-# 주요 기능:
-# 1. 3단 탭 구조 (다운로드 센터, 뷰어, 가이드)
-# 2. 비동기 다운로드 스레드 (UI 멈춤 방지)
-# 3. 설정 자동 로드/저장 및 UI 반영
-# 4. 실시간 로그 표시 및 프로그레스바 연동
+# [Sleekes Download Management]
 # =============================================================================
 
 class DownloadThread(QThread):
-    """
-    다운로드 작업을 백그라운드에서 처리하는 스레드 클래스입니다.
-    메인 UI 스레드가 멈추지 않도록 별도의 스레드에서 yt-dlp를 실행합니다.
-    """
-    progress = Signal(dict)   # 진행률 정보 전달 시그널
-    log = Signal(str)         # 로그 메시지 전달 시그널
-    finished_signal = Signal(bool) # 작업 완료 여부 전달 시그널
+    """백그라운드에서 yt-dlp 작업을 수행하는 스레드"""
+    progress = Signal(dict)
+    log = Signal(str)
+    finished_signal = Signal(bool)
 
     def __init__(self, url, output_path, options):
-        """
-        스레드 초기화
-        Args:
-            url (str): 대상 URL
-            output_path (str): 저장 경로
-            options (dict): 다운로드 옵션들
-        """
         super().__init__()
         self.url = url
         self.output_path = output_path
         self.options = options
 
     def run(self):
-        """
-        스레드 시작 시 호출되는 메서드.
-        Downloader 인스턴스를 생성하고 다운로드를 수행합니다.
-        """
         downloader = SleekesDownloader(
             progress_callback=self.progress.emit,
             log_callback=self.log.emit
@@ -58,353 +35,290 @@ class DownloadThread(QThread):
         self.finished_signal.emit(success)
 
 class SleekesMainWindow(QMainWindow):
-    """
-    Sleekes 애플리케이션의 메인 윈도우 클래스입니다.
-    """
+    """Sleekes 메인 윈도우 - 무채색 디자인(Design Mode) 지원"""
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sleekes - 범용 동영상 아카이빙 솔루션")
-        self.setMinimumSize(950, 800) # 쾌적한 화면 크기 설정
+        self.setWindowTitle("SLEEKES - Potent Universal Archiver")
+        self.setMinimumSize(1000, 850)
         
-        # 설정 파일 로드
         self.settings = load_settings() 
-        
-        # UI 구성요소 초기화
         self.init_ui()
+        self.load_settings_to_ui()
         
-        # 로드된 설정을 UI 컴포넌트에 반영
-        self.load_settings_to_ui() 
-        
-        # 전체 스타일시트 적용 (다크 테마, 글래스모피즘)
-        self.setStyleSheet(MAIN_STYLE)
+        # 테마 초기화
+        initial_theme = self.settings.get("theme", "Dark")
+        idx = self.theme_combo.findText(initial_theme)
+        if idx >= 0:
+            self.theme_combo.setCurrentIndex(idx)
+        self.apply_theme(initial_theme)
 
     def init_ui(self):
-        """
-        화면의 전체적인 레이아웃과 위젯들을 생성하고 배치합니다.
-        """
         central_widget = QWidget()
         central_widget.setObjectName("MainFrame")
         self.setCentralWidget(central_widget)
         
         main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setContentsMargins(25, 25, 25, 25)
         
-        # --- 1. 상단 헤더 및 헬프 버튼 ---
-        header_layout = QHBoxLayout()
+        # --- [Header Area] ---
+        header = QHBoxLayout()
         
-        title_box = QVBoxLayout()
-        title_label = QLabel("Sleekes")
-        title_label.setObjectName("TitleLabel")
-        subtitle_label = QLabel("Potent. Pure. Permanent. 초월적 아카이빙 시스템")
-        subtitle_label.setStyleSheet("color: #64748b; margin-top: -5px; margin-bottom: 5px;")
-        title_box.addWidget(title_label)
-        title_box.addWidget(subtitle_label)
+        title_vbox = QVBoxLayout()
+        title = QLabel("SLEEKES")
+        title.setObjectName("TitleLabel")
+        subtitle = QLabel("POTENT . PURE . PERMANENT")
+        subtitle.setStyleSheet("color: #888888; letter-spacing: 5px; font-weight: bold; font-size: 10px; margin-top: -5px;")
+        title_vbox.addWidget(title)
+        title_vbox.addWidget(subtitle)
+        header.addLayout(title_vbox)
         
-        header_layout.addLayout(title_box)
-        header_layout.addStretch()
+        header.addStretch()
         
-        # 도움말 바로가기 버튼
-        self.help_btn = QPushButton("도움말 및 가이드")
-        self.help_btn.setObjectName("SecondaryButton")
-        self.help_btn.setCursor(Qt.PointingHandCursor)
-        self.help_btn.clicked.connect(self.go_to_guide_tab)
-        header_layout.addWidget(self.help_btn)
+        # Design Mode Dropdown
+        mode_layout = QHBoxLayout()
+        mode_label = QLabel("DESIGN MODE:")
+        mode_label.setStyleSheet("font-size: 11px; font-weight: bold; color: #888,888;")
+        self.theme_combo = QComboBox()
+        self.theme_combo.addItems(["Dark", "Light"])
+        self.theme_combo.currentTextChanged.connect(self.apply_theme)
+        mode_layout.addWidget(mode_label)
+        mode_layout.addWidget(self.theme_combo)
+        header.addLayout(mode_layout)
         
-        main_layout.addLayout(header_layout)
+        header.addSpacing(20)
+        
+        self.guide_nav_btn = QPushButton(" Guide")
+        self.guide_nav_btn.setObjectName("SecondaryButton")
+        self.guide_nav_btn.clicked.connect(lambda: self.tabs.setCurrentIndex(2))
+        header.addWidget(self.guide_nav_btn)
+        
+        main_layout.addLayout(header)
 
-        # --- 2. 메인 탭 위젯 구성 ---
+        # --- [Tab System] ---
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.create_main_tab(), "📂 다운로드 센터")
-        self.tabs.addTab(JsonViewerWidget(), "📊 메타데이터 뷰어")
-        # 가이드 탭은 인스턴스를 멤버변수로 저장해두어 나중에 접근 가능하게 함
-        self.guide_tab = GuideViewWidget()
-        self.tabs.addTab(self.guide_tab, "📘 플랫폼 & 가이드")
+        self.tab_downloader = self.create_downloader_tab()
+        self.tab_metadata = JsonViewerWidget()
+        self.tab_guide = GuideViewWidget()
+        
+        self.tabs.addTab(self.tab_downloader, "Downloader")
+        self.tabs.addTab(self.tab_metadata, "Metadata")
+        self.tabs.addTab(self.tab_guide, "Reference")
         
         main_layout.addWidget(self.tabs)
 
-    def create_main_tab(self):
-        """
-        '다운로드 센터' 탭의 내부 UI를 생성합니다.
-        """
+    def apply_theme(self, theme_name):
+        """무채색 테마 즉시 전환 및 SVG 아이콘 동기화"""
+        is_dark = (theme_name == "Dark")
+        self.setStyleSheet(styles.STYLE_DARK if is_dark else styles.STYLE_LIGHT)
+        
+        icon_color = "#ffffff" if is_dark else "#000000"
+        
+        # Tab Icons
+        self.tabs.setTabIcon(0, icons.svg_to_icon(icons.ICON_DOWNLOAD_CENTER, icon_color))
+        self.tabs.setTabIcon(1, icons.svg_to_icon(icons.ICON_METADATA_VIEWER, icon_color))
+        self.tabs.setTabIcon(2, icons.svg_to_icon(icons.ICON_GUIDE, icon_color))
+        self.tabs.setIconSize(QSize(22, 22))
+        
+        # UI Button Icons
+        self.rec_btn.setIcon(icons.svg_to_icon(icons.ICON_RECOMMENDED, icon_color))
+        self.guide_nav_btn.setIcon(icons.svg_to_icon(icons.ICON_GUIDE, icon_color))
+        
+        # Save preference
+        self.settings["theme"] = theme_name
+        save_settings(self.settings)
+
+    def create_downloader_tab(self):
         tab = QWidget()
         layout = QVBoxLayout(tab)
-        layout.setContentsMargins(10, 20, 10, 10)
-        layout.setSpacing(15)
+        layout.setContentsMargins(15, 25, 15, 15)
+        layout.setSpacing(20)
 
-        # [입력 섹션] URL 입력창
-        url_layout = QHBoxLayout()
+        # 1. URL Input
         self.url_input = QLineEdit()
-        self.url_input.setPlaceholderText("동영상, 재생목록, 또는 채널 URL을 입력하세요 (유튜브, 인스타, 틱톡 등 지원)")
-        url_layout.addWidget(self.url_input)
-        layout.addLayout(url_layout)
+        self.url_input.setPlaceholderText("Paste video, playlist, or channel URL here...")
+        self.url_input.setMinimumHeight(45)
+        layout.addWidget(self.url_input)
 
-        # [경로 섹션] 저장 폴더 선택
-        path_layout = QHBoxLayout()
+        # 2. Path Selection
+        path_box = QHBoxLayout()
         self.path_input = QLineEdit()
-        self.path_input.setPlaceholderText("저장될 폴더 경로")
-        path_btn = QPushButton("폴더 선택")
+        self.path_input.setPlaceholderText("Select archiving directory...")
+        path_btn = QPushButton("Browse")
         path_btn.setObjectName("SecondaryButton")
         path_btn.clicked.connect(self.select_path)
-        path_layout.addWidget(self.path_input)
-        path_layout.addWidget(path_btn)
-        layout.addLayout(path_layout)
+        path_box.addWidget(self.path_input)
+        path_box.addWidget(path_btn)
+        layout.addLayout(path_box)
 
-        # [옵션 그룹] 아카이빙 설정 컨테이너
-        options_group = QGroupBox("아카이빙 및 엔진 설정")
-        options_layout = QVBoxLayout()
+        # 3. Engine Options
+        opt_group = QGroupBox("ENGINE CONFIGURATION")
+        opt_layout = QVBoxLayout()
         
-        # > 상단 옵션: 핵심 모드 선택
-        main_opts_layout = QHBoxLayout()
-        self.archive_mode_cb = QCheckBox("전체 아카이빙 모드 (권장)")
-        self.archive_mode_cb.setToolTip("영상과 함께 설명, 자막, 댓글 등 모든 데이터를 수집합니다.")
-        self.archive_mode_cb.setStyleSheet("color: #38bdf8; font-weight: bold;")
+        top_opts = QHBoxLayout()
+        self.archive_mode_cb = QCheckBox("Complete Archiving")
+        self.audio_mode_cb = QCheckBox("Extraction Only (MP3)")
+        self.skip_download_cb = QCheckBox("Metadata Only")
+        self.stealth_mode_cb = QCheckBox("Anti-Ban Stealth")
         
-        self.audio_mode_cb = QCheckBox("오디오만 추출 (MP3)")
-        self.audio_mode_cb.setToolTip("영상 없이 고음질 음원만 추출합니다.")
-        
-        self.skip_download_cb = QCheckBox("데이터만 수집 (영상 제외)")
-        self.skip_download_cb.setToolTip("용량이 큰 영상 파일은 받지 않고 메타데이터만 빠르게 수집합니다.")
-        
-        self.stealth_mode_cb = QCheckBox("차단방지 스텔스 모드")
-        self.stealth_mode_cb.setToolTip("속도를 늦추고 유저에이전트를 무작위화하여 403 차단을 방지합니다.")
-        self.stealth_mode_cb.setStyleSheet("color: #f87171; font-weight: bold;")
-
-        # > 권장 설정 원클릭 버튼
-        self.rec_btn = QPushButton("✨ 권장 설정 적용")
+        self.rec_btn = QPushButton(" Load Recommended")
         self.rec_btn.setObjectName("SecondaryButton")
-        self.rec_btn.setToolTip("채널 통째로 아카이빙할 때 추천하는 [안전+스텔스] 설정을 적용합니다.")
         self.rec_btn.clicked.connect(self.apply_recommended_settings)
-        self.rec_btn.setStyleSheet("color: #facc15; border-color: #facc15;")
-
-        main_opts_layout.addWidget(self.archive_mode_cb)
-        main_opts_layout.addWidget(self.audio_mode_cb)
-        main_opts_layout.addWidget(self.skip_download_cb)
-        main_opts_layout.addWidget(self.stealth_mode_cb)
-        main_opts_layout.addStretch()
-        main_opts_layout.addWidget(self.rec_btn)
-        options_layout.addLayout(main_opts_layout)
         
-        # > 상세 데이터 옵션 (체크박스)
-        detail_grid = QHBoxLayout()
-        self.desc_cb = QCheckBox("설명")
-        self.json_cb = QCheckBox("정보(JSON)")
-        self.subs_cb = QCheckBox("자막")
-        self.thumb_cb = QCheckBox("썸네일")
-        self.comments_cb = QCheckBox("댓글(JSON)")
-
+        top_opts.addWidget(self.archive_mode_cb)
+        top_opts.addWidget(self.audio_mode_cb)
+        top_opts.addWidget(self.skip_download_cb)
+        top_opts.addWidget(self.stealth_mode_cb)
+        top_opts.addStretch()
+        top_opts.addWidget(self.rec_btn)
+        opt_layout.addLayout(top_opts)
+        
+        detail_opts = QHBoxLayout()
+        self.desc_cb = QCheckBox("Desc")
+        self.json_cb = QCheckBox("JSON")
+        self.subs_cb = QCheckBox("Subs")
+        self.thumb_cb = QCheckBox("Thumb")
+        self.comments_cb = QCheckBox("Comments")
         for cb in [self.desc_cb, self.json_cb, self.subs_cb, self.thumb_cb, self.comments_cb]:
-            detail_grid.addWidget(cb)
-            cb.setEnabled(False) # 아카이브 모드가 켜져있으면 기본 활성화(비활성 상태)
-
-        # 아카이브 모드 토글 시 상세 옵션 상태 변경 연결
+            detail_opts.addWidget(cb)
+            cb.setEnabled(False)
         self.archive_mode_cb.toggled.connect(self.toggle_archive_options)
-        options_layout.addLayout(detail_grid)
-
-        # > 하단 엔진/고급 설정
-        adv_layout = QHBoxLayout()
+        opt_layout.addLayout(detail_opts)
         
-        # 휴식 시간 (Anti-Ban)
-        adv_layout.addWidget(QLabel("휴식(분):"))
+        # Advanced/Sleep Settings
+        ext_opts = QHBoxLayout()
+        ext_opts.addWidget(QLabel("MIN SLEEP(m):"))
         self.sleep_input = QLineEdit()
-        self.sleep_input.setToolTip("영상/데이터 요청 사이의 휴식 시간(분). 소수점 가능 (예: 0.5는 30초).")
-        self.sleep_input.setMaximumWidth(60)
-        self.sleep_input.setAlignment(Qt.AlignCenter)
-        adv_layout.addWidget(self.sleep_input)
-
-        # 쿠키 브라우저 선택
-        adv_layout.addSpacing(15)
-        adv_layout.addWidget(QLabel("쿠키 연동:"))
-        from PySide6.QtWidgets import QComboBox
+        self.sleep_input.setMaximumWidth(70)
+        ext_opts.addWidget(self.sleep_input)
+        
+        ext_opts.addSpacing(15)
+        ext_opts.addWidget(QLabel("MAX SLEEP(m):"))
+        self.max_sleep_input = QLineEdit()
+        self.max_sleep_input.setMaximumWidth(70)
+        self.max_sleep_input.setPlaceholderText("30.0")
+        ext_opts.addWidget(self.max_sleep_input)
+        
+        ext_opts.addSpacing(15)
+        ext_opts.addWidget(QLabel("AUTH COOKIES:"))
         self.cookie_browser = QComboBox()
-        self.cookie_browser.setToolTip("비공개/성인인증 영상을 위해 브라우저 로그인 정보를 빌려옵니다.")
         self.cookie_browser.addItems(["None", "chrome", "firefox", "edge", "safari"])
-        self.cookie_browser.setMinimumWidth(100)
-        adv_layout.addWidget(self.cookie_browser)
+        ext_opts.addWidget(self.cookie_browser)
+        
+        self.flat_output_cb = QCheckBox("Bypass Folder Structure")
+        ext_opts.addWidget(self.flat_output_cb)
+        opt_layout.addLayout(ext_opts)
+        
+        opt_group.setLayout(opt_layout)
+        layout.addWidget(opt_group)
 
-        # 플레이리스트 범위 지정
-        adv_layout.addSpacing(15)
-        adv_layout.addWidget(QLabel("Playlist범위:"))
-        self.playlist_items_input = QLineEdit()
-        self.playlist_items_input.setPlaceholderText("예: 1-5, 10")
-        self.playlist_items_input.setToolTip("전체가 아닌 특정 순번의 영상만 받고 싶을 때 입력하세요.")
-        adv_layout.addWidget(self.playlist_items_input)
+        # 4. Action Button
+        self.run_btn = QPushButton("EXECUTE ARCHIVING")
+        self.run_btn.setObjectName("PrimaryButton")
+        self.run_btn.setMinimumHeight(65)
+        self.run_btn.clicked.connect(self.start_download)
+        layout.addWidget(self.run_btn)
 
-        # 폴더 구조 플랫하게
-        self.flat_output_cb = QCheckBox("폴더정리 끄기")
-        self.flat_output_cb.setToolTip("채널/날짜별 폴더를 만들지 않고 한 곳에 파일을 저장합니다.")
-        adv_layout.addWidget(self.flat_output_cb)
+        # 5. Monitoring
+        self.pbar = QProgressBar()
+        self.pbar.setValue(0)
+        self.pbar.setTextVisible(False)
+        layout.addWidget(self.pbar)
 
-        options_layout.addLayout(adv_layout)
-        options_group.setLayout(options_layout)
-        layout.addWidget(options_group)
-
-        # [실행 버튼]
-        self.download_button = QPushButton("아카이빙 시작")
-        self.download_button.setObjectName("PrimaryButton")
-        self.download_button.clicked.connect(self.start_download)
-        self.download_button.setCursor(Qt.PointingHandCursor)
-        self.download_button.setMinimumHeight(50) # 버튼 크기 키움
-        layout.addWidget(self.download_button)
-
-        # [진행 표시줄]
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setValue(0)
-        self.progress_bar.setTextVisible(False) # 텍스트 대신 깔끔한 바만 표시
-        layout.addWidget(self.progress_bar)
-
-        # [로그 영역]
-        self.log_area = QTextEdit()
-        self.log_area.setObjectName("LogArea")
-        self.log_area.setReadOnly(True)
-        self.log_area.setPlaceholderText("작업 로그가 여기에 표시됩니다... (자세한 진행 상황 확인 가능)")
-        layout.addWidget(self.log_area)
+        self.log_widget = QTextEdit()
+        self.log_widget.setObjectName("LogArea")
+        self.log_widget.setReadOnly(True)
+        layout.addWidget(self.log_widget)
 
         return tab
 
-    def go_to_guide_tab(self):
-        """
-        '도움말' 버튼 클릭 시 가이드 탭으로 이동합니다.
-        """
-        self.tabs.setCurrentIndex(2) # 2번 인덱스가 가이드 탭
+    # --- [Logic Methods] ---
+
+    def select_path(self):
+        path = QFileDialog.getExistingDirectory(self, "Select Archive Directory", self.path_input.text())
+        if path:
+            self.path_input.setText(path)
+
+    def toggle_archive_options(self, checked):
+        for cb in [self.desc_cb, self.json_cb, self.subs_cb, self.thumb_cb, self.comments_cb]:
+            cb.setEnabled(not checked)
+
+    def apply_recommended_settings(self):
+        self.archive_mode_cb.setChecked(True)
+        self.stealth_mode_cb.setChecked(True)
+        self.sleep_input.setText("5.0")
+        self.max_sleep_input.setText("30.0")
+        self.audio_mode_cb.setChecked(False)
+        self.skip_download_cb.setChecked(False)
+        self.flat_output_cb.setChecked(False)
+        self.cookie_browser.setCurrentText("None")
+        self.add_log("READY: Ultra-Stealth Channel Archiving Mode (5m~30m Random Sleep)")
 
     def load_settings_to_ui(self):
-        """
-        저장된 설정(settings 딕셔너리)을 UI 위젯들의 상태에 반영합니다.
-        """
         s = self.settings
         self.archive_mode_cb.setChecked(s.get("archive_mode", True))
         self.audio_mode_cb.setChecked(s.get("only_audio", False))
         self.skip_download_cb.setChecked(s.get("skip_download", False))
-        self.stealth_mode_cb.setChecked(s.get("stealth_mode", True)) # 기본적으로 켜둠 (안전제일)
-        self.sleep_input.setText(str(s.get("sleep_interval_min", 1.0))) # 분 단위 기본값
-        
-        # 콤보박스 텍스트로 인덱스 찾아 설정
-        cb_idx = self.cookie_browser.findText(s.get("cookie_browser", "None"))
-        if cb_idx >= 0:
-            self.cookie_browser.setCurrentIndex(cb_idx)
-            
+        self.stealth_mode_cb.setChecked(s.get("stealth_mode", True))
+        self.sleep_input.setText(str(s.get("sleep_interval_min", "1.0")))
+        self.max_sleep_input.setText(str(s.get("max_sleep_interval_min", "30.0")))
+        idx = self.cookie_browser.findText(s.get("cookie_browser", "None"))
+        if idx >= 0: self.cookie_browser.setCurrentIndex(idx)
         self.flat_output_cb.setChecked(s.get("flat_output", False))
-        
-        # 마지막 경로 복원
-        last_path = s.get("last_path", os.getcwd())
-        if os.path.exists(last_path):
-            self.path_input.setText(last_path)
-        else:
-            self.path_input.setText(os.getcwd())
-
-        # 아카이브 모드에 따른 상세 체크박스 활성/비활성 초기화
-        self.toggle_archive_options(self.archive_mode_cb.isChecked())
+        self.path_input.setText(s.get("last_path", os.getcwd()))
 
     def save_current_settings(self):
-        """
-        현재 UI 위젯들의 값을 읽어 설정 파일(JSON)에 저장합니다.
-        프로그램 종료 시나 작업 시작 시 호출됩니다.
-        """
-        try:
-            sleep_min = float(self.sleep_input.text())
-        except:
-            sleep_min = 1.0 # 예외 발생 시 기본값 1분
-
+        try: sleep_min = float(self.sleep_input.text())
+        except: sleep_min = 1.0
+        try: max_sleep = float(self.max_sleep_input.text())
+        except: max_sleep = 30.0
+        
         self.settings.update({
             "archive_mode": self.archive_mode_cb.isChecked(),
             "only_audio": self.audio_mode_cb.isChecked(),
             "skip_download": self.skip_download_cb.isChecked(),
             "stealth_mode": self.stealth_mode_cb.isChecked(),
             "sleep_interval_min": sleep_min,
+            "max_sleep_interval_min": max_sleep,
             "cookie_browser": self.cookie_browser.currentText(),
             "flat_output": self.flat_output_cb.isChecked(),
             "last_path": self.path_input.text()
         })
         save_settings(self.settings)
 
-    def apply_recommended_settings(self):
-        """
-        '권장 설정 적용' 버튼 핸들러.
-        채널 전체 아카이빙 시 403 차단을 피하기 위한 가장 안전한 설정을 강제 적용합니다.
-        """
-        self.archive_mode_cb.setChecked(True)  # 전체 아카이빙 켜기
-        self.stealth_mode_cb.setChecked(True)   # 스텔스 모드 (403 방어) 켜기
-        self.audio_mode_cb.setChecked(False)   # 오디오 전용 끄기
-        self.skip_download_cb.setChecked(False)# 영상 생략 끄기
-        self.sleep_input.setText("5.0")        # 최소 5분 자동 세팅
-        self.flat_output_cb.setChecked(False)  # 폴더 정리 켜기
-        self.cookie_browser.setCurrentText("None") # 쿠키 제외
-        self.add_log("💡 초강력 [채널 보존 모드] 적용: 최소 5분 ~ 최대 30분 랜덤 대기")
-        self.add_log("   (이 설정은 유튜브 차단을 피하기 위한 가장 강력한 방패입니다.)")
-
-    def toggle_archive_options(self, checked):
-        """
-        '전체 아카이빙 모드' 체크박스 토글 시 호출.
-        하위 상세 옵션들을 비활성화(자동 처리됨을 의미)하거나 활성화합니다.
-        """
-        for cb in [self.desc_cb, self.json_cb, self.subs_cb, self.thumb_cb, self.comments_cb]:
-            cb.setEnabled(not checked)
-
-    def select_path(self):
-        """
-        폴더 선택 다이얼로그를 띄웁니다.
-        """
-        path = QFileDialog.getExistingDirectory(self, "저장 폴더 선택", self.path_input.text())
-        if path:
-            self.path_input.setText(path)
-
     def start_download(self):
-        """
-        '아카이빙 시작' 버튼 핸들러.
-        설정을 읽고 검증한 뒤, 다운로드 스레드를 시작합니다.
-        """
         url = self.url_input.text().strip()
-        if not url:
-            self.add_log("⚠️ URL을 먼저 입력해주세요.")
-            QMessageBox.warning(self, "URL 누락", "다운로드할 URL을 입력해주세요.")
-            return
+        if not url: return
 
-        self.save_current_settings() # 작업 전 설정 자동 저장
+        self.save_current_settings()
+        
+        try: sleep_sec = float(self.sleep_input.text()) * 60.0
+        except: sleep_sec = 60.0
+        try: max_sleep_sec = float(self.max_sleep_input.text()) * 60.0
+        except: max_sleep_sec = 1800.0
 
-        # 휴식 시간 파싱 (분을 초로 변환)
-        try:
-            sleep_sec = float(self.sleep_input.text()) * 60.0
-        except:
-            sleep_sec = 60.0
-
-        # 쿠키 브라우저
-        cookie_b = self.cookie_browser.currentText()
-        if cookie_b == "None":
-            cookie_b = None
-
-        # 옵션 딕셔너리 구성
         options = {
             'archive_mode': self.archive_mode_cb.isChecked(),
-            # 아카이브 모드면 하위 옵션은 무조건 True로 간주
             'write_description': self.desc_cb.isChecked() or self.archive_mode_cb.isChecked(),
             'write_info_json': self.json_cb.isChecked() or self.archive_mode_cb.isChecked(),
             'write_subs': self.subs_cb.isChecked() or self.archive_mode_cb.isChecked(),
             'write_auto_subs': self.subs_cb.isChecked() or self.archive_mode_cb.isChecked(),
             'write_thumbnail': self.thumb_cb.isChecked() or self.archive_mode_cb.isChecked(),
             'get_comments': self.comments_cb.isChecked() or self.archive_mode_cb.isChecked(),
-            
             'only_audio': self.audio_mode_cb.isChecked(),
             'skip_download': self.skip_download_cb.isChecked(),
-            
-            # Anti-ban sleep settings (최소 설정값 ~ 최대 30분 랜덤)
-            'max_sleep_interval': max(sleep_sec * 2.0, 1800.0) if self.stealth_mode_cb.isChecked() else sleep_sec * 2,
             'sleep_interval': sleep_sec,
-            'sleep_requests': min(sleep_sec / 2.0, 300.0) if self.stealth_mode_cb.isChecked() else 0, 
-            
+            'max_sleep_interval': max_sleep_sec if self.stealth_mode_cb.isChecked() else sleep_sec * 2,
+            'sleep_requests': min(sleep_sec / 2.0, 300.0) if self.stealth_mode_cb.isChecked() else 0,
             'stealth_mode': self.stealth_mode_cb.isChecked(),
-            'cookies_from_browser': cookie_b,
-            'playlist_items': self.playlist_items_input.text().strip() or None,
+            'cookies_from_browser': None if self.cookie_browser.currentText() == "None" else self.cookie_browser.currentText(),
             'flat_output': self.flat_output_cb.isChecked(),
             'ignore_errors': True
         }
 
-        # UI 상태 변경 (중복 실행 방지)
-        self.download_button.setEnabled(False)
-        self.download_button.setText("작업 진행 중...")
-        self.progress_bar.setValue(0)
-        self.add_log(f"--- Sleekes Engine 가동: {url} ---")
+        self.run_btn.setEnabled(False)
+        self.pbar.setValue(0)
+        self.add_log(f"ENGINE START: Initializing secure stream for {url}")
 
-        # 스레드 생성 및 시작
         self.thread = DownloadThread(url, self.path_input.text(), options)
         self.thread.progress.connect(self.update_progress)
         self.thread.log.connect(self.add_log)
@@ -413,46 +327,26 @@ class SleekesMainWindow(QMainWindow):
 
     @Slot(dict)
     def update_progress(self, d):
-        """
-        스레드에서 보내오는 진행률 정보를 받아 프로그레스바를 업데이트합니다.
-        """
         if d['status'] == 'downloading':
             try:
-                p_text = d.get('_percent_str', '0%').replace('%', '')
-                p_val = float(p_text)
-                self.progress_bar.setValue(int(p_val))
-            except:
-                pass
+                p = float(d.get('_percent_str', '0%').replace('%', ''))
+                self.pbar.setValue(int(p))
+            except: pass
 
     @Slot(str)
     def add_log(self, message):
-        """
-        로그창에 텍스트를 추가하고 자동으로 스크롤을 내립니다.
-        """
-        self.log_area.append(message)
-        self.log_area.verticalScrollBar().setValue(self.log_area.verticalScrollBar().maximum())
+        self.log_widget.append(message)
+        self.log_widget.verticalScrollBar().setValue(self.log_widget.verticalScrollBar().maximum())
 
     @Slot(bool)
     def on_finished(self, success):
-        """
-        작업이 완료되었을 때 호출되는 슬롯.
-        UI를 다시 활성화하고 완료 메시지를 띄웁니다.
-        """
-        self.download_button.setEnabled(True)
-        self.download_button.setText("아카이빙 시작")
-        
+        self.run_btn.setEnabled(True)
         if success:
-            self.progress_bar.setValue(100)
-            self.add_log("--- ✅ 아카이빙 작업이 성공적으로 완료되었습니다 ---")
-            self.save_current_settings() 
-            QMessageBox.information(self, "완료", "모든 아카이빙 작업이 완료되었습니다.")
+            self.pbar.setValue(100)
+            self.add_log("SYSTEM: All assets secured and archived successfully.")
         else:
-            self.add_log("--- ❌ 작업 중 오류가 발생했습니다 (로그 확인 필요) ---")
-            QMessageBox.critical(self, "실패", "작업 중 오류가 발생했습니다.\n로그를 확인해주세요.")
-    
+            self.add_log("SYSTEM: Task interrupted or failed. Check logs above.")
+
     def closeEvent(self, event):
-        """
-        창 닫기 이벤트 핸들러. 종료 전 설정을 자동 저장합니다.
-        """
         self.save_current_settings()
         event.accept()

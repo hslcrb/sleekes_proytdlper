@@ -21,7 +21,7 @@ class SleekesDownloader:
         
         if d['status'] == 'finished':
             if self.log_callback:
-                self.log_callback("영상 데이터 확보 완료. 아카이빙 후처리 중...")
+                self.log_callback("DONE: Asset secured. Processing...")
 
     def download(self, url: str, output_path: str, options: dict):
         out_tmpl = os.path.join(output_path, '%(uploader)s/%(upload_date)s - %(title)s/%(title)s.%(ext)s')
@@ -114,15 +114,17 @@ class SleekesDownloader:
             ydl_opts['skip_download'] = True
 
         if self.log_callback:
-            self.log_callback(f"Sleekes 스텔스 엔진 가동 중: {url}")
+            self.log_callback(f"ENGINE START: {url}")
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
+            if self.log_callback:
+                self.log_callback("SUCCESS: Archiving session completed.")
             return True
         except Exception as e:
             if self.log_callback:
-                self.log_callback(f"솔루션 실행 중 오류 발생: {str(e)}")
+                self.log_callback(f"ERROR: {str(e)}")
             return False
 
     def get_info(self, url: str):
@@ -143,5 +145,5 @@ class SleekesDownloader:
                 return ydl.extract_info(url, download=False)
         except Exception as e:
             if self.log_callback:
-                self.log_callback(f"정보 추출 중 오류: {str(e)}")
+                self.log_callback(f"ERROR: Metadata extraction failed: {str(e)}")
             return None

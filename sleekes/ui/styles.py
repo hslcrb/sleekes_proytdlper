@@ -1,134 +1,205 @@
-MAIN_STYLE = """
+# --- Achromatic Design System for Sleekes ---
+
+# 다크 모드 (무채색)
+STYLE_DARK = """
 QMainWindow {
-    background-color: #0f172a;
+    background-color: #000000;
 }
 
 QWidget {
-    color: #e2e8f0;
+    color: #ffffff;
     font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
 }
 
 #MainFrame {
-    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #0f172a, stop:0.5 #1e293b, stop:1 #0f172a);
-    border-radius: 15px;
+    background-color: #111111;
+    border: 1px solid #333333;
+    border-radius: 12px;
 }
 
 QLabel#TitleLabel {
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 900;
-    color: #38bdf8;
-    margin-bottom: 5px;
-    letter-spacing: 2px;
+    color: #ffffff;
+    letter-spacing: 1px;
 }
 
 QLineEdit {
-    background-color: rgba(30, 41, 59, 180);
-    border: 1px solid #334155;
-    border-radius: 10px;
-    padding: 12px;
+    background-color: #222222;
+    border: 1px solid #444444;
+    border-radius: 6px;
+    padding: 10px;
     font-size: 14px;
-    color: #f1f5f9;
+    color: #ffffff;
 }
 
 QLineEdit:focus {
-    border: 1px solid #38bdf8;
-    background-color: rgba(30, 41, 59, 255);
+    border: 1px solid #ffffff;
 }
 
 QPushButton#PrimaryButton {
-    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #0ea5e9, stop:1 #2dd4bf);
-    color: #ffffff;
-    border-radius: 10px;
-    padding: 15px 30px;
-    font-size: 18px;
+    background-color: #ffffff;
+    color: #000000;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 16px;
     font-weight: bold;
     border: none;
 }
 
 QPushButton#PrimaryButton:hover {
-    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #38bdf8, stop:1 #5eead4);
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
-}
-
-
-QPushButton#PrimaryButton:pressed {
-    background-color: #0ea5e9;
+    background-color: #cccccc;
 }
 
 QPushButton#SecondaryButton {
     background-color: transparent;
-    border: 1px solid #475569;
-    color: #94a3b8;
-    border-radius: 8px;
-    padding: 8px 16px;
+    border: 1px solid #444444;
+    color: #aaaaaa;
+    border-radius: 6px;
+    padding: 6px 12px;
 }
 
 QPushButton#SecondaryButton:hover {
-    background-color: rgba(71, 85, 105, 50);
-    color: #f1f5f9;
+    background-color: #222222;
+    color: #ffffff;
+    border: 1px solid #ffffff;
 }
 
-QCheckBox {
-    spacing: 8px;
-    font-size: 13px;
-    color: #94a3b8;
-}
-
-QCheckBox::indicator {
-    width: 18px;
-    height: 18px;
-    border: 1px solid #475569;
-    border-radius: 4px;
-}
-
-QCheckBox::indicator:checked {
-    background-color: #38bdf8;
-    image: url(check.png); /* 실제로는 스타일로 더 복잡하게 할 수 있음 */
-}
-
-QTextEdit#LogArea {
-    background-color: rgba(15, 23, 42, 220);
-    border: 1px solid #1e293b;
-    border-radius: 10px;
-    font-family: 'Consolas', 'Cascadia Code', monospace;
-    font-size: 12px;
-    color: #94a3b8;
-    padding: 10px;
+QComboBox {
+    background-color: #222222;
+    border: 1px solid #444444;
+    border-radius: 6px;
+    padding: 5px;
+    color: #ffffff;
 }
 
 QTabWidget::pane {
-    border: 1px solid #1e293b;
+    border: 1px solid #333333;
     background: transparent;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
 }
 
 QTabBar::tab {
-    background: #1e293b;
-    color: #94a3b8;
-    padding: 10px 20px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    margin-right: 5px;
+    background: #222222;
+    color: #888888;
+    padding: 10px 15px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    margin-right: 2px;
 }
 
 QTabBar::tab:selected {
-    background: #38bdf8;
-    color: #0f172a;
+    background: #333333;
+    color: #ffffff;
     font-weight: bold;
 }
 
-#GuideArea {
-    background-color: rgba(15, 23, 42, 180);
-    border-radius: 10px;
-    padding: 20px;
-}
-
-#MetadataView {
-    background-color: #020617;
-    border: 1px solid #1e293b;
+QTextEdit#LogArea {
+    background-color: #050505;
+    border: 1px solid #222222;
     border-radius: 8px;
     font-family: 'Consolas', monospace;
-    color: #38bdf8;
+    color: #cccccc;
+}
+"""
+
+# 라이트 모드 (무채색)
+STYLE_LIGHT = """
+QMainWindow {
+    background-color: #f5f5f5;
+}
+
+QWidget {
+    color: #000000;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+}
+
+#MainFrame {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+}
+
+QLabel#TitleLabel {
+    font-size: 32px;
+    font-weight: 900;
+    color: #000000;
+    letter-spacing: 1px;
+}
+
+QLineEdit {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    color: #000000;
+}
+
+QLineEdit:focus {
+    border: 1px solid #000000;
+}
+
+QPushButton#PrimaryButton {
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+}
+
+QPushButton#PrimaryButton:hover {
+    background-color: #333333;
+}
+
+QPushButton#SecondaryButton {
+    background-color: transparent;
+    border: 1px solid #cccccc;
+    color: #666666;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+QPushButton#SecondaryButton:hover {
+    background-color: #f0f0f0;
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 5px;
+    color: #000000;
+}
+
+QTabWidget::pane {
+    border: 1px solid #dddddd;
+    background: transparent;
+}
+
+QTabBar::tab {
+    background: #eeeeee;
+    color: #999999;
+    padding: 10px 15px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background: #ffffff;
+    color: #000000;
+    font-weight: bold;
+}
+
+QTextEdit#LogArea {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    font-family: 'Consolas', monospace;
+    color: #333333;
 }
 """
