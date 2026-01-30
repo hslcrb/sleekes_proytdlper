@@ -46,6 +46,7 @@ class JsonViewerWidget(QWidget):
         super().__init__()
         self.current_file_path = None
         self.current_data = None
+        self.current_lang = "EN"
         self.init_ui()
 
     def init_ui(self):
@@ -105,15 +106,33 @@ class JsonViewerWidget(QWidget):
         
         layout.addWidget(self.stack)
 
+    def update_language(self, lang_code):
+        """다국어 지원 레이블 업데이트"""
+        self.current_lang = lang_code
+        if lang_code == "KO":
+            self.btn_load.setText("파일 열기")
+            self.rb_render.setText("보고서 형태")
+            self.rb_source.setText("소스 코드")
+            if not self.current_file_path:
+                self.lbl_status.setText("메타데이터(.json) 또는 설명(.description) 파일을 열어보세요.")
+        else:
+            self.btn_load.setText("Open File")
+            self.rb_render.setText("REPORTS")
+            self.rb_source.setText("SOURCE")
+            if not self.current_file_path:
+                self.lbl_status.setText("Open a .json or .description file to view metadata.")
+
     def load_file(self):
+        title = "Select File" if self.current_lang == "EN" else "파일 선택"
         fname, _ = QFileDialog.getOpenFileName(
-            self, "Select File", "", 
+            self, title, "", 
             "Supported Files (*.json *.description *.txt);;All Files (*)"
         )
         if not fname: return
 
         self.current_file_path = fname
-        self.lbl_status.setText(f"File: {os.path.basename(fname)}")
+        status_prefix = "File: " if self.current_lang == "EN" else "파일: "
+        self.lbl_status.setText(f"{status_prefix}{os.path.basename(fname)}")
         
         try:
             with open(fname, 'r', encoding='utf-8') as f:
@@ -137,32 +156,37 @@ class JsonViewerWidget(QWidget):
                 
             self.browser.setHtml(html_content)
         except Exception as e:
-            self.lbl_status.setText(f"Error: {str(e)}")
+            err_prefix = "Error: " if self.current_lang == "EN" else "오류: "
+            self.lbl_status.setText(f"{err_prefix}{str(e)}")
 
     def switch_view(self, rb):
         self.stack.setCurrentIndex(0) if self.rb_render.isChecked() else self.stack.setCurrentIndex(1)
 
     def render_text_to_html(self, text):
         safe_text = html.escape(text).replace('\n', '<br>')
+        title = "DESCRIPTION" if self.current_lang == "EN" else "상세 설명"
         return f"""
         <style>
             body {{ color: #ffffff; background-color: #000000; font-family: sans-serif; line-height: 1.6; padding: 20px; }}
             .box {{ border: 1px solid #333333; padding: 15px; border-radius: 4px; }}
         </style>
-        <h3>DESCRIPTION</h3>
+        <h3>{title}</h3>
         <div class="box">{safe_text}</div>
         """
 
     def render_json_to_html(self, data):
         if not isinstance(data, dict): return self.render_text_to_html(str(data))
         
-        title = data.get('title', 'Untitled')
+        title = data.get('title', 'Untitled or Missing')
         uploader = data.get('uploader', 'Unknown')
+        
+        comments_title = "COMMENTS" if self.current_lang == "EN" else "댓글"
+        uploader_label = "Uploader" if self.current_lang == "EN" else "게시자"
         
         comments_html = ""
         if 'comments' in data and isinstance(data['comments'], list):
-            comments_html += "<h3>COMMENTS</h3>"
-            for c in data['comments'][:50]: # Show top 50
+            comments_html += f"<h3>{comments_title}</h3>"
+            for c in data['comments'][:100]: # Show top 100
                 author = html.escape(c.get('author', 'Anonymous'))
                 text = html.escape(c.get('text', '')).replace('\n', '<br>')
                 comments_html += f"""
@@ -180,7 +204,7 @@ class JsonViewerWidget(QWidget):
             .box {{ border: 1px solid #333; padding: 15px; margin-bottom: 20px; }}
         </style>
         <h1>{html.escape(title)}</h1>
-        <div class="meta">Uploader: {uploader}</div>
-        <div class="box">{html.escape(data.get('description', '')[:500]).replace('\n', '<br>')}...</div>
+        <div class="meta">{uploader_label}: {uploader}</div>
+        <div class="box">{html.escape(data.get('description', '')[:1000]).replace('\n', '<br>')}...</div>
         {comments_html}
         """

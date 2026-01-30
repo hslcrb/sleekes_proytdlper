@@ -169,6 +169,10 @@ class SleekesMainWindow(QMainWindow):
         # Metadata Tab (JSON Viewer)
         if hasattr(self.tab_metadata, "update_language"):
             self.tab_metadata.update_language(lang_code)
+            
+        # Reference Tab (Guide)
+        if hasattr(self, "tab_guide"):
+            self.tab_guide.update_language(lang_code)
 
         # Settings Save
         self.settings["language"] = lang_code
