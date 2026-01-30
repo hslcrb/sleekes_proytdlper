@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, QThread, Signal, Slot, QSize
 from PySide6.QtGui import QIcon, QFont, QAction
 from sleekes.core.downloader import SleekesDownloader
 from sleekes.core.config import load_settings, save_settings
-from sleekes.ui import styles, icons
+from sleekes.ui import styles, icons, i18n
 from sleekes.ui.json_viewer import JsonViewerWidget
 from sleekes.ui.guide_view import GuideViewWidget
 import os
@@ -15,7 +15,6 @@ import os
 # =============================================================================
 
 class DownloadThread(QThread):
-    """백그라운드에서 yt-dlp 작업을 수행하는 스레드"""
     progress = Signal(dict)
     log = Signal(str)
     finished_signal = Signal(bool)
@@ -35,22 +34,25 @@ class DownloadThread(QThread):
         self.finished_signal.emit(success)
 
 class SleekesMainWindow(QMainWindow):
-    """Sleekes 메인 윈도우 - 무채색 디자인(Design Mode) 지원"""
+    """Sleekes 메인 윈도우 - 다국어(KO/EN) 및 무채색 디자인 지원"""
     def __init__(self):
         super().__init__()
+        self.settings = load_settings()
+        self.current_lang = self.settings.get("language", "EN")
+        
         self.setWindowTitle("SLEEKES - Potent Universal Archiver")
         self.setMinimumSize(1000, 850)
         
-        self.settings = load_settings() 
         self.init_ui()
         self.load_settings_to_ui()
         
-        # 테마 초기화
+        # 디자인 및 언어 초기화
         initial_theme = self.settings.get("theme", "Dark")
-        idx = self.theme_combo.findText(initial_theme)
-        if idx >= 0:
-            self.theme_combo.setCurrentIndex(idx)
+        self.theme_combo.setCurrentText(initial_theme)
+        self.lang_combo.setCurrentText(self.current_lang)
+        
         self.apply_theme(initial_theme)
+        self.apply_language(self.current_lang)
 
     def init_ui(self):
         central_widget = QWidget()
@@ -74,14 +76,27 @@ class SleekesMainWindow(QMainWindow):
         
         header.addStretch()
         
-        # Design Mode Dropdown
+        # Language Selector
+        lang_layout = QHBoxLayout()
+        self.lang_label = QLabel("LANGUAGE:")
+        self.lang_label.setStyleSheet("font-size: 11px; font-weight: bold; color: #888;")
+        self.lang_combo = QComboBox()
+        self.lang_combo.addItems(["EN", "KO"])
+        self.lang_combo.currentTextChanged.connect(self.apply_language)
+        lang_layout.addWidget(self.lang_label)
+        lang_layout.addWidget(self.lang_combo)
+        header.addLayout(lang_layout)
+        
+        header.addSpacing(15)
+
+        # Design Mode Selector
         mode_layout = QHBoxLayout()
-        mode_label = QLabel("DESIGN MODE:")
-        mode_label.setStyleSheet("font-size: 11px; font-weight: bold; color: #888,888;")
+        self.mode_label = QLabel("DESIGN MODE:")
+        self.mode_label.setStyleSheet("font-size: 11px; font-weight: bold; color: #888;")
         self.theme_combo = QComboBox()
         self.theme_combo.addItems(["Dark", "Light"])
         self.theme_combo.currentTextChanged.connect(self.apply_theme)
-        mode_layout.addWidget(mode_label)
+        mode_layout.addWidget(self.mode_label)
         mode_layout.addWidget(self.theme_combo)
         header.addLayout(mode_layout)
         
@@ -107,25 +122,65 @@ class SleekesMainWindow(QMainWindow):
         main_layout.addWidget(self.tabs)
 
     def apply_theme(self, theme_name):
-        """무채색 테마 즉시 전환 및 SVG 아이콘 동기화"""
         is_dark = (theme_name == "Dark")
         self.setStyleSheet(styles.STYLE_DARK if is_dark else styles.STYLE_LIGHT)
-        
         icon_color = "#ffffff" if is_dark else "#000000"
         
-        # Tab Icons
-        self.tabs.setTabIcon(0, icons.svg_to_icon(icons.ICON_DOWNLOAD_CENTER, icon_color))
-        self.tabs.setTabIcon(1, icons.svg_to_icon(icons.ICON_METADATA_VIEWER, icon_color))
-        self.tabs.setTabIcon(2, icons.svg_to_icon(icons.ICON_GUIDE, icon_color))
-        self.tabs.setIconSize(QSize(22, 22))
-        
-        # UI Button Icons
-        self.rec_btn.setIcon(icons.svg_to_icon(icons.ICON_RECOMMENDED, icon_color))
-        self.guide_nav_btn.setIcon(icons.svg_to_icon(icons.ICON_GUIDE, icon_color))
-        
-        # Save preference
+        self.update_icons(icon_color)
         self.settings["theme"] = theme_name
         save_settings(self.settings)
+
+    def apply_language(self, lang_code):
+        """앱의 모든 텍스트를 선택된 언어로 번역합니다."""
+        self.current_lang = lang_code
+        t = i18n.TRANSLATIONS[lang_code]
+        
+        # Nav & Header
+        self.tabs.setTabText(0, t["nav_downloader"])
+        self.tabs.setTabText(1, t["nav_metadata"])
+        self.tabs.setTabText(2, t["nav_guide"])
+        self.mode_label.setText(t["design_mode"])
+        self.lang_label.setText(t["lang_mode"])
+        self.guide_nav_btn.setText(t["btn_guide"])
+        
+        # Downloader Tab
+        self.url_input.setPlaceholderText(t["url_placeholder"])
+        self.path_input.setPlaceholderText(t["path_placeholder"])
+        self.path_btn.setText(t["btn_browse"])
+        self.opt_group.setTitle(t["engine_group"])
+        self.archive_mode_cb.setText(t["opt_full_archive"])
+        self.audio_mode_cb.setText(t["opt_audio_only"])
+        self.skip_download_cb.setText(t["opt_metadata_only"])
+        self.stealth_mode_cb.setText(t["opt_stealth"])
+        self.rec_btn.setText(t["btn_rec"])
+        
+        self.desc_cb.setText(t["detail_desc"])
+        self.json_cb.setText(t["detail_json"])
+        self.subs_cb.setText(t["detail_subs"])
+        self.thumb_cb.setText(t["detail_thumb"])
+        self.comments_cb.setText(t["detail_comments"])
+        
+        self.min_sleep_label.setText(t["min_sleep"])
+        self.max_sleep_label.setText(t["max_sleep"])
+        self.cookie_label.setText(t["auth_cookies"])
+        self.flat_output_cb.setText(t["opt_flat"])
+        self.run_btn.setText(t["btn_execute"])
+        
+        # Metadata Tab (JSON Viewer)
+        if hasattr(self.tab_metadata, "update_language"):
+            self.tab_metadata.update_language(lang_code)
+
+        # Settings Save
+        self.settings["language"] = lang_code
+        save_settings(self.settings)
+
+    def update_icons(self, color):
+        self.tabs.setTabIcon(0, icons.svg_to_icon(icons.ICON_DOWNLOAD_CENTER, color))
+        self.tabs.setTabIcon(1, icons.svg_to_icon(icons.ICON_METADATA_VIEWER, color))
+        self.tabs.setTabIcon(2, icons.svg_to_icon(icons.ICON_GUIDE, color))
+        self.tabs.setIconSize(QSize(22, 22))
+        self.rec_btn.setIcon(icons.svg_to_icon(icons.ICON_RECOMMENDED, color))
+        self.guide_nav_btn.setIcon(icons.svg_to_icon(icons.ICON_GUIDE, color))
 
     def create_downloader_tab(self):
         tab = QWidget()
@@ -133,34 +188,29 @@ class SleekesMainWindow(QMainWindow):
         layout.setContentsMargins(15, 25, 15, 15)
         layout.setSpacing(20)
 
-        # 1. URL Input
         self.url_input = QLineEdit()
-        self.url_input.setPlaceholderText("Paste video, playlist, or channel URL here...")
         self.url_input.setMinimumHeight(45)
         layout.addWidget(self.url_input)
 
-        # 2. Path Selection
         path_box = QHBoxLayout()
         self.path_input = QLineEdit()
-        self.path_input.setPlaceholderText("Select archiving directory...")
-        path_btn = QPushButton("Browse")
-        path_btn.setObjectName("SecondaryButton")
-        path_btn.clicked.connect(self.select_path)
+        self.path_btn = QPushButton()
+        self.path_btn.setObjectName("SecondaryButton")
+        self.path_btn.clicked.connect(self.select_path)
         path_box.addWidget(self.path_input)
-        path_box.addWidget(path_btn)
+        path_box.addWidget(self.path_btn)
         layout.addLayout(path_box)
 
-        # 3. Engine Options
-        opt_group = QGroupBox("ENGINE CONFIGURATION")
+        self.opt_group = QGroupBox()
         opt_layout = QVBoxLayout()
         
         top_opts = QHBoxLayout()
-        self.archive_mode_cb = QCheckBox("Complete Archiving")
-        self.audio_mode_cb = QCheckBox("Extraction Only (MP3)")
-        self.skip_download_cb = QCheckBox("Metadata Only")
-        self.stealth_mode_cb = QCheckBox("Anti-Ban Stealth")
+        self.archive_mode_cb = QCheckBox()
+        self.audio_mode_cb = QCheckBox()
+        self.skip_download_cb = QCheckBox()
+        self.stealth_mode_cb = QCheckBox()
         
-        self.rec_btn = QPushButton(" Load Recommended")
+        self.rec_btn = QPushButton()
         self.rec_btn.setObjectName("SecondaryButton")
         self.rec_btn.clicked.connect(self.apply_recommended_settings)
         
@@ -173,52 +223,51 @@ class SleekesMainWindow(QMainWindow):
         opt_layout.addLayout(top_opts)
         
         detail_opts = QHBoxLayout()
-        self.desc_cb = QCheckBox("Desc")
-        self.json_cb = QCheckBox("JSON")
-        self.subs_cb = QCheckBox("Subs")
-        self.thumb_cb = QCheckBox("Thumb")
-        self.comments_cb = QCheckBox("Comments")
+        self.desc_cb = QCheckBox()
+        self.json_cb = QCheckBox()
+        self.subs_cb = QCheckBox()
+        self.thumb_cb = QCheckBox()
+        self.comments_cb = QCheckBox()
         for cb in [self.desc_cb, self.json_cb, self.subs_cb, self.thumb_cb, self.comments_cb]:
             detail_opts.addWidget(cb)
             cb.setEnabled(False)
         self.archive_mode_cb.toggled.connect(self.toggle_archive_options)
         opt_layout.addLayout(detail_opts)
         
-        # Advanced/Sleep Settings
         ext_opts = QHBoxLayout()
-        ext_opts.addWidget(QLabel("MIN SLEEP(m):"))
+        self.min_sleep_label = QLabel()
+        ext_opts.addWidget(self.min_sleep_label)
         self.sleep_input = QLineEdit()
         self.sleep_input.setMaximumWidth(70)
         ext_opts.addWidget(self.sleep_input)
         
         ext_opts.addSpacing(15)
-        ext_opts.addWidget(QLabel("MAX SLEEP(m):"))
+        self.max_sleep_label = QLabel()
+        ext_opts.addWidget(self.max_sleep_label)
         self.max_sleep_input = QLineEdit()
         self.max_sleep_input.setMaximumWidth(70)
-        self.max_sleep_input.setPlaceholderText("30.0")
         ext_opts.addWidget(self.max_sleep_input)
         
         ext_opts.addSpacing(15)
-        ext_opts.addWidget(QLabel("AUTH COOKIES:"))
+        self.cookie_label = QLabel()
+        ext_opts.addWidget(self.cookie_label)
         self.cookie_browser = QComboBox()
         self.cookie_browser.addItems(["None", "chrome", "firefox", "edge", "safari"])
         ext_opts.addWidget(self.cookie_browser)
         
-        self.flat_output_cb = QCheckBox("Bypass Folder Structure")
+        self.flat_output_cb = QCheckBox()
         ext_opts.addWidget(self.flat_output_cb)
         opt_layout.addLayout(ext_opts)
         
-        opt_group.setLayout(opt_layout)
-        layout.addWidget(opt_group)
+        self.opt_group.setLayout(opt_layout)
+        layout.addWidget(self.opt_group)
 
-        # 4. Action Button
-        self.run_btn = QPushButton("EXECUTE ARCHIVING")
+        self.run_btn = QPushButton()
         self.run_btn.setObjectName("PrimaryButton")
         self.run_btn.setMinimumHeight(65)
         self.run_btn.clicked.connect(self.start_download)
         layout.addWidget(self.run_btn)
 
-        # 5. Monitoring
         self.pbar = QProgressBar()
         self.pbar.setValue(0)
         self.pbar.setTextVisible(False)
@@ -231,12 +280,9 @@ class SleekesMainWindow(QMainWindow):
 
         return tab
 
-    # --- [Logic Methods] ---
-
     def select_path(self):
         path = QFileDialog.getExistingDirectory(self, "Select Archive Directory", self.path_input.text())
-        if path:
-            self.path_input.setText(path)
+        if path: self.path_input.setText(path)
 
     def toggle_archive_options(self, checked):
         for cb in [self.desc_cb, self.json_cb, self.subs_cb, self.thumb_cb, self.comments_cb]:
@@ -247,11 +293,7 @@ class SleekesMainWindow(QMainWindow):
         self.stealth_mode_cb.setChecked(True)
         self.sleep_input.setText("5.0")
         self.max_sleep_input.setText("30.0")
-        self.audio_mode_cb.setChecked(False)
-        self.skip_download_cb.setChecked(False)
-        self.flat_output_cb.setChecked(False)
-        self.cookie_browser.setCurrentText("None")
-        self.add_log("READY: Ultra-Stealth Channel Archiving Mode (5m~30m Random Sleep)")
+        self.add_log(i18n.TRANSLATIONS[self.current_lang]["log_ready_rec"])
 
     def load_settings_to_ui(self):
         s = self.settings
@@ -281,13 +323,16 @@ class SleekesMainWindow(QMainWindow):
             "max_sleep_interval_min": max_sleep,
             "cookie_browser": self.cookie_browser.currentText(),
             "flat_output": self.flat_output_cb.isChecked(),
-            "last_path": self.path_input.text()
+            "last_path": self.path_input.text(),
+            "language": self.current_lang
         })
         save_settings(self.settings)
 
     def start_download(self):
         url = self.url_input.text().strip()
-        if not url: return
+        if not url:
+            QMessageBox.warning(self, "Error", i18n.TRANSLATIONS[self.current_lang]["msg_url_missing"])
+            return
 
         self.save_current_settings()
         
@@ -317,7 +362,7 @@ class SleekesMainWindow(QMainWindow):
 
         self.run_btn.setEnabled(False)
         self.pbar.setValue(0)
-        self.add_log(f"ENGINE START: Initializing secure stream for {url}")
+        self.add_log(i18n.TRANSLATIONS[self.current_lang]["engine_start"].format(url=url))
 
         self.thread = DownloadThread(url, self.path_input.text(), options)
         self.thread.progress.connect(self.update_progress)
@@ -341,11 +386,12 @@ class SleekesMainWindow(QMainWindow):
     @Slot(bool)
     def on_finished(self, success):
         self.run_btn.setEnabled(True)
+        t = i18n.TRANSLATIONS[self.current_lang]
         if success:
             self.pbar.setValue(100)
-            self.add_log("SYSTEM: All assets secured and archived successfully.")
+            self.add_log(t["success"])
         else:
-            self.add_log("SYSTEM: Task interrupted or failed. Check logs above.")
+            self.add_log(t["fail"])
 
     def closeEvent(self, event):
         self.save_current_settings()

@@ -1,46 +1,44 @@
-# SLEEKES: Achromatic Archiving System
+# SLEEKES: Achromatic Archiving System (Potent . Pure . Permanent)
 
-**SLEEKES** is a potent, minimalist video archiving solution built on the power of the `yt-dlp` engine. It is designed to secure digital heritage—descriptions, metadata, comments, and subtitles—with a focus on permanence and ultimate purity.
+[English](#english) | [한국어](#한국어)
 
-## Key Features
+---
 
-- **Achromatic Design Mode**: A high-contrast, distraction-free environment supporting both Pure Dark and Pure Light themes.
-- **SVG Icon System**: All traditional emojis have been replaced with custom-coded SVG icons for a professional, consistent aesthetic.
-- **403 Forbidden Protection**: Advanced anti-bot measures including Android/iOS client emulation and intelligent User-Agent rotation.
-- **Precision Sleep Engine**: Configurable minute-based sleep intervals (e.g., 5m to 30m random range) to bypass the most aggressive IP blocks.
-- **Complete Archiving**: Secures descriptions (.desc), metadata (.json), high-quality thumbnails, and all comments in a single session.
-- **Audio Specialist Mode**: Extracts the highest fidelity audio streams with AI-enhanced post-processing to MP3 format.
-- **Global Platform Support**: Securely archives content from YouTube, Instagram, TikTok, Facebook, and thousands of other platforms.
+## English
 
-## Installation & Execution
+**SLEEKES** is a potent, minimalist video archiving solution built on the power of the `yt-dlp` engine. It is designed to secure digital heritage with a focus on permanence and ultimate purity.
 
-### 1. Quick Start
-Run the provided shell script to automatically configure the virtual environment and launch the system.
+### Key Features
+- **Achromatic Design Mode**: Pure Dark and Pure Light themes for minimal distraction.
+- **Multilingual Support**: Instant toggle between English and Korean.
+- **SVG Icon System**: Professional custom-coded SVG icons replace all emojis.
+- **403 Forbidden Protection**: Android/iOS client emulation & intelligent User-Agent rotation.
+- **Precision Sleep Engine**: Minute-based randomized delay (e.g., 5m to 30m) to bypass IP blocks.
+- **Complete Archiving**: Secures videos, descriptions, thumbnails, and comments in one session.
+
+### Execution
 ```bash
 ./run.sh
 ```
 
-### 2. Manual Execution
+---
+
+## 한국어
+
+**SLEEKES**는 `yt-dlp` 엔진의 강력함을 기반으로 설계된 초전절제형 동영상 아카이빙 솔루션입니다. 디지털 유산을 가장 순수하고 영구적인 상태로 보존하는 데 최적화되어 있습니다.
+
+### 주요 기능
+- **무채색 디자인 모드**: 집중력을 극대화하는 퓨어 다크 및 퓨어 라이트 테마 지원.
+- **다국어 지원**: 한국어와 영어를 즉시 전환할 수 있는 i18n 시스템 탑재.
+- **SVG 아이콘 시스템**: 모든 이모지를 제거하고 직접 코딩한 무채색 SVG 아이콘으로 대체.
+- **403 차단 완벽 방어**: 안드로이드/iOS 클라이언트 위장 및 지능형 유저에이전트 로테이션.
+- **정밀 휴식 엔진**: 분 단위 랜덤 지연(예: 5분~30분)을 통해 유튜브 IP 차단을 완벽히 회피.
+- **완벽한 아카이빙**: 영상, 설명, 썸네일, 모든 댓글을 단 한 번의 세션으로 영구 보존.
+
+### 실행 방법
 ```bash
-# Activate environment
-source venv/bin/activate
-
-# Launch Achromatic GUI
-python main.py
-
-# CLI Mode Execution
-python main.py [URL] --rec
+./run.sh
 ```
-
-## CLI Command Guide
-
-- **Recommended Mode (Secure)**: `python main.py [URL] --rec`
-- **Audio Extraction**: `python main.py [URL] -x`
-- **Safe Full Archive**: `python main.py [URL] --archive --sleep 5`
-- **Help/Manual**: `python main.py help`
-
-## License
-Licensed under the [Apache License 2.0](LICENSE).
 
 ---
 *Developed by Antigravity. Potent . Pure . Permanent.*
