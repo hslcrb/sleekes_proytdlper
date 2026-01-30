@@ -165,16 +165,21 @@ class SleekesMainWindow(QMainWindow):
         self.skip_download_cb = QCheckBox("데이터만 수집 (영상 제외)")
         self.skip_download_cb.setToolTip("용량이 큰 영상 파일은 받지 않고 메타데이터만 빠르게 수집합니다.")
         
+        self.stealth_mode_cb = QCheckBox("차단방지 스텔스 모드")
+        self.stealth_mode_cb.setToolTip("속도를 늦추고 유저에이전트를 무작위화하여 403 차단을 방지합니다.")
+        self.stealth_mode_cb.setStyleSheet("color: #f87171; font-weight: bold;")
+
         # > 권장 설정 원클릭 버튼
         self.rec_btn = QPushButton("✨ 권장 설정 적용")
         self.rec_btn.setObjectName("SecondaryButton")
-        self.rec_btn.setToolTip("초보자를 위한 최적의 아카이빙 설정을 자동으로 맞춥니다.")
+        self.rec_btn.setToolTip("채널 통째로 아카이빙할 때 추천하는 [안전+스텔스] 설정을 적용합니다.")
         self.rec_btn.clicked.connect(self.apply_recommended_settings)
         self.rec_btn.setStyleSheet("color: #facc15; border-color: #facc15;")
 
         main_opts_layout.addWidget(self.archive_mode_cb)
         main_opts_layout.addWidget(self.audio_mode_cb)
         main_opts_layout.addWidget(self.skip_download_cb)
+        main_opts_layout.addWidget(self.stealth_mode_cb)
         main_opts_layout.addStretch()
         main_opts_layout.addWidget(self.rec_btn)
         options_layout.addLayout(main_opts_layout)
@@ -270,7 +275,8 @@ class SleekesMainWindow(QMainWindow):
         self.archive_mode_cb.setChecked(s.get("archive_mode", True))
         self.audio_mode_cb.setChecked(s.get("only_audio", False))
         self.skip_download_cb.setChecked(s.get("skip_download", False))
-        self.sleep_input.setText(str(s.get("sleep_interval", 5)))
+        self.stealth_mode_cb.setChecked(s.get("stealth_mode", True)) # 기본적으로 켜둠 (안전제일)
+        self.sleep_input.setText(str(s.get("sleep_interval", 15)))
         
         # 콤보박스 텍스트로 인덱스 찾아 설정
         cb_idx = self.cookie_browser.findText(s.get("cookie_browser", "None"))
@@ -303,6 +309,7 @@ class SleekesMainWindow(QMainWindow):
             "archive_mode": self.archive_mode_cb.isChecked(),
             "only_audio": self.audio_mode_cb.isChecked(),
             "skip_download": self.skip_download_cb.isChecked(),
+            "stealth_mode": self.stealth_mode_cb.isChecked(),
             "sleep_interval": sleep_val,
             "cookie_browser": self.cookie_browser.currentText(),
             "flat_output": self.flat_output_cb.isChecked(),
@@ -313,15 +320,17 @@ class SleekesMainWindow(QMainWindow):
     def apply_recommended_settings(self):
         """
         '권장 설정 적용' 버튼 핸들러.
-        가장 안전하고 일반적인 아카이빙 값으로 UI를 강제 설정합니다.
+        채널 전체 아카이빙 시 403 차단을 피하기 위한 가장 안전한 설정을 강제 적용합니다.
         """
         self.archive_mode_cb.setChecked(True)  # 전체 아카이빙 켜기
+        self.stealth_mode_cb.setChecked(True)   # 스텔스 모드 (403 방어) 켜기
         self.audio_mode_cb.setChecked(False)   # 오디오 전용 끄기
         self.skip_download_cb.setChecked(False)# 영상 생략 끄기
-        self.sleep_input.setText("5")          # 5초 휴식
+        self.sleep_input.setText("15")         # 15초(최대 30초) 랜덤 휴식 설정
         self.flat_output_cb.setChecked(False)  # 폴더 정리 켜기
-        self.cookie_browser.setCurrentText("None") # 쿠키 끄기
-        self.add_log("💡 초보자를 위한 [권장 설정]이 적용되었습니다.")
+        self.cookie_browser.setCurrentText("None") # 쿠키 제외 (요청사항)
+        self.add_log("💡 채널 보존을 위한 [안전 아카이빙 + 스텔스 모드]가 적용되었습니다.")
+        self.add_log("   (속도는 조금 느리지만 차단 위험을 최소화합니다.)")
 
     def toggle_archive_options(self, checked):
         """
@@ -378,9 +387,11 @@ class SleekesMainWindow(QMainWindow):
             'skip_download': self.skip_download_cb.isChecked(),
             
             # Anti-ban sleep settings
-            'max_sleep_interval': sleep_val * 2 if sleep_val > 0 else 0,
+            'max_sleep_interval': sleep_val * 2 if sleep_val > 0 else 30, # 최소 30초 랜덤성 확보
             'sleep_interval': sleep_val,
+            'sleep_requests': 5 if self.stealth_mode_cb.isChecked() else 0, # 요청마다 5초 대기
             
+            'stealth_mode': self.stealth_mode_cb.isChecked(),
             'cookies_from_browser': cookie_b,
             'playlist_items': self.playlist_items_input.text().strip() or None,
             'flat_output': self.flat_output_cb.isChecked(),

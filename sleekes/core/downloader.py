@@ -1,6 +1,7 @@
 import os
 import yt_dlp
 from typing import Callable, Optional
+from sleekes.core.uastream import get_random_ua
 
 # =============================================================================
 # [Sleekes Core Downloader]
@@ -88,7 +89,6 @@ class SleekesDownloader:
             'outtmpl': out_tmpl,                     # 출력 경로 템플릿
             
             # --- 아카이빙 및 메타데이터 관련 ---
-            # archive_mode가 True면 개별 옵션이 꺼져 있어도 강제로 켭니다.
             'writedescription': options.get('write_description', False) or options.get('archive_mode', False),
             'writeinfojson': options.get('write_info_json', False) or options.get('archive_mode', False),
             'writesubtitles': options.get('write_subs', False) or options.get('archive_mode', False),
@@ -99,13 +99,42 @@ class SleekesDownloader:
             # --- 후처리 및 포맷 관련 ---
             'postprocessors': [],
             
-            # --- 안전 및 우회(Anti-Ban) 관련 ---
+            # --- 안전 및 우회(Anti-Ban) 관련 강화 ---
             'sleep_interval': options.get('sleep_interval', 0),         # 고정 휴식 시간
             'max_sleep_interval': options.get('max_sleep_interval', 0), # 랜덤 최대 휴식 시간
             'sleep_interval_requests': options.get('sleep_requests', 0), # 요청 간 휴식
-            'ignoreerrors': options.get('ignore_errors', True),          # 에러 발생 시(비공개 영상 등) 멈추지 않고 건너뜀
-            'no_clean_info_json': True,  # JSON 파일을 한 줄이 아닌, 들여쓰기 된 형태로 저장 (가독성 향상)
+            'ignoreerrors': options.get('ignore_errors', True),          # 에러 발생 시 건너뜀
+            'no_clean_info_json': True,
+            'wait_for_video': (5, 60), # 채널 전체 작업 시 영상이 비공개/처리중이면 대기
+            
+            # 403 Forbidden 방어를 위한 추가 헤더 및 설정
+            'nocheckcertificate': True,
+            'geo_bypass': True,
+            'no_warnings': True,
         }
+
+        # [강력한 Anti-Ban 로직] - 유저에이전트 로테이션 및 헤더 위조
+        random_ua = get_random_ua()
+        
+        ydl_opts['user_agent'] = random_ua
+        ydl_opts['http_headers'] = {
+            'User-Agent': random_ua,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Sec-Fetch-Mode': 'navigate',
+            'Referer': 'https://www.google.com/', # 실제 구글 검색 피니시처럼 보이게 함
+        }
+
+        # 스텔스 모드 강화 시
+        if options.get('stealth_mode', False):
+            # 속도 제한 (초당 500K 정도로 제한하여 서버 부하 감소 및 봇 탐지 회피)
+            ydl_opts['ratelimit'] = 500 * 1024 
+            # 요청 간 지연 강제 적용
+            if ydl_opts['sleep_interval'] == 0:
+                ydl_opts['sleep_interval'] = 10
+                ydl_opts['max_sleep_interval'] = 30
+            # 커넥션 수 제한
+            ydl_opts['concurrent_fragment_downloads'] = 1
 
         # 3. 포맷(화질/음질) 설정
         if options.get('only_audio', False):
@@ -178,7 +207,17 @@ class SleekesDownloader:
         Returns:
             dict: 영상 정보 딕셔너리 (실패 시 None)
         """
-        ydl_opts = {}
+        random_ua = get_random_ua()
+        ydl_opts = {
+            'user_agent': random_ua,
+            'http_headers': {
+                'User-Agent': random_ua,
+                'Accept': '*/*',
+                'Referer': 'https://www.google.com/',
+            },
+            'nocheckcertificate': True,
+            'geo_bypass': True,
+        }
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
