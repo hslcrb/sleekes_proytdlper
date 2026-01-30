@@ -93,12 +93,29 @@ QTabBar::tab:selected {
     font-weight: bold;
 }
 
-QTextEdit#LogArea {
+QTextEdit#LogArea, QTextBrowser#GuideArea {
     background-color: #050505;
     border: 1px solid #222222;
     border-radius: 8px;
     font-family: 'Consolas', monospace;
     color: #cccccc;
+}
+
+QCheckBox {
+    spacing: 10px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #444444;
+    border-radius: 4px;
+    background-color: #111111;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
 }
 """
 
@@ -195,11 +212,28 @@ QTabBar::tab:selected {
     font-weight: bold;
 }
 
-QTextEdit#LogArea {
+QTextEdit#LogArea, QTextBrowser#GuideArea {
     background-color: #ffffff;
     border: 1px solid #dddddd;
     border-radius: 8px;
     font-family: 'Consolas', monospace;
     color: #333333;
+}
+
+QCheckBox {
+    spacing: 10px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #000000;
+    border: 1px solid #000000;
 }
 """

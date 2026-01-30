@@ -127,6 +127,11 @@ class SleekesMainWindow(QMainWindow):
         icon_color = "#ffffff" if is_dark else "#000000"
         
         self.update_icons(icon_color)
+        
+        # Guide Theme Sync
+        if hasattr(self, "tab_guide"):
+            self.tab_guide.update_theme(theme_name)
+            
         self.settings["theme"] = theme_name
         save_settings(self.settings)
 

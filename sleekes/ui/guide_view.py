@@ -9,6 +9,8 @@ class GuideViewWidget(QWidget):
     """
     def __init__(self):
         super().__init__()
+        self.current_lang = "EN"
+        self.current_theme = "Dark"
         self.init_ui()
 
     def init_ui(self):
@@ -19,13 +21,30 @@ class GuideViewWidget(QWidget):
         self.browser.setOpenExternalLinks(True)
         self.browser.setObjectName("GuideArea")
         
-        # 초기화 (기본값 EN)
-        self.update_language("EN")
-        
         layout.addWidget(self.browser)
 
+    def update_content(self, lang_code=None, theme_name=None):
+        """언어와 테마를 조합하여 가이드 내용을 즉시 갱신합니다."""
+        if lang_code: self.current_lang = lang_code
+        if theme_name: self.current_theme = theme_name
+        
+        is_dark = (self.current_theme == "Dark")
+        
+        # 테마별 색상 정의
+        colors = {
+            "bg_color": "#050505" if is_dark else "#ffffff",
+            "text_color": "#ffffff" if is_dark else "#000000",
+            "sub_color": "#444" if is_dark else "#999",
+            "box_bg": "#111" if is_dark else "#f9f9f9",
+            "box_border": "#333" if is_dark else "#ddd",
+            "content": i18n.TRANSLATIONS[self.current_lang]["content_html"]
+        }
+        
+        html_content = i18n.GUIDE_TEMPLATE.format(**colors)
+        self.browser.setHtml(html_content)
+
     def update_language(self, lang_code):
-        """언어 코드를 받아 가이드 내용을 즉시 갱신합니다."""
-        if lang_code in i18n.TRANSLATIONS:
-            html_content = i18n.TRANSLATIONS[lang_code]["guide_html"]
-            self.browser.setHtml(html_content)
+        self.update_content(lang_code=lang_code)
+        
+    def update_theme(self, theme_name):
+        self.update_content(theme_name=theme_name)
