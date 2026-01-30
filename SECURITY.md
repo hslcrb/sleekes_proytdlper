@@ -2,29 +2,32 @@
 
 ## Supported Versions
 
-Only the latest `stable` release of Sleekes is currently supported with security updates.
-
 | Version | Supported          |
 | ------- | ------------------ |
-| v0.x    | :white_check_mark: |
-| < v0.x  | :x:                |
+| 1.0.x   | :white_check_mark: |
+| < 1.0   | :x:                |
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within Sleekes, please do not disclose it publicly until it has been addressed.
+Security is a core pillar of the Sleekes project. If you find a security vulnerability, please do not disclose it publicly. Instead, report it directly to the maintainers.
 
-1. **Email**: Please send a detailed report to the maintainer (rheeworks@example.com - Replace with actual if available).
-2. **GitHub Issues**: You may also open a **private** issue if the repository settings allow, or contact via GitHub security advisory tab.
+### IP Exposure & Anti-Ban
+Sleekes includes advanced measures to protect your IP from being flagged as a bot by major platforms. These include:
+- **Mobile Emulation**: Spoofing request headers to appear as a legitimate mobile client (Android/iOS).
+- **UA Rotation**: Dynamic switching of browser identities.
+- **Randomized Throttling**: Variable sleep intervals to mimic human behavior.
 
-We will acknowledge your report within 48 hours and provide an estimated timeline for the fix.
+If you discover a way these measures can be bypassed or manipulated to expose user data or risk IP safety, please report it immediately.
 
-## Security Features
+### Data Privacy
+Sleekes is a local-first application. 
+- No metadata or personal information is transmitted to external servers.
+- Auth cookies are used only locally to communicate with the target platform.
 
-Sleekes includes several security-minded features:
-- **Anti-Ban (Sleep Mode)**: Prevents IP blocking by YouTube through intelligent throttling.
-- **Cookie Handling**: Browser cookies are read strictly for authentication purposes and are not stored permanently or transmitted externally by Sleekes.
-- **Local Execution**: All data processing happens locally on your machine. No metadata is sent to any third-party servers other than the video platforms themselves.
+## Response Process
+1. Acknowledgment within 48 hours.
+2. Draft fix prepared for testing.
+3. Coordinated public disclosure after the fix is merged.
 
-## Disclaimer
-
-This tool is provided for archiving purposes. The developers are not responsible for any misuse, including but not limited to copyright infringement or violation of terms of service of the target platforms. Use responsibly.
+---
+*Stay Pure. Stay Secure.*

@@ -1,36 +1,42 @@
-# 기여 가이드 (Contributing to Sleekes)
+# Contributing to Sleekes
 
-Sleekes 프로젝트에 관심을 가져주셔서 감사합니다! 🎉
-본 문서는 프로젝트에 기여하는 방법과 절차를 안내합니다.
+Thank you for your interest in contributing to Sleekes. We value contributions that maintain the project's core principles: Potency, Purity, and Permanence.
 
-## 1. 기여 방법 (How to Contribute)
+## 1. How to Contribute
 
-### 버그 신고 (Reporting Bugs)
-소프트웨어 사용 중 오류를 발견하셨다면 GitHub Issues 탭에 제보해 주세요.
-- 사용 중인 OS와 Sleekes 버전
-- 오류 발생 상황 및 로그 내용
-- 재현 방법
+### Bug Reports
+If you encounter an issue, please report it via GitHub Issues with:
+- OS Version and Sleekes build version.
+- Detailed log output (Achromatic logs).
+- Steps to reproduce the error.
 
-### 기능 제안 (Suggesting Features)
-새로운 기능 아이디어가 있다면 언제든 환영합니다.
-- 어떤 기능이 필요한지
-- 왜 그 기능이 유용한지 구체적으로 설명해 주세요.
+### Feature Proposals
+We welcome ideas for new features that align with the minimalist aesthetic.
+- Describe the feature clearly.
+- Explain how it enhances the archiving experience without adding unnecessary clutter.
 
-### 코드 기여 (Pull Requests)
-1. 이 저장소를 **Fork** 합니다.
-2. 새로운 기능 브랜치를 생성합니다 (`git checkout -b feature/NewFeature`).
-3. 변경 사항을 커밋합니다 (`git commit -m 'Add some NewFeature'`).
-4. 브랜치에 푸시합니다 (`git push origin feature/NewFeature`).
-5. **Pull Request**를 생성합니다.
+### Code Contributions
+1. **Fork** the repository.
+2. Create a new branch (`git checkout -b feature/NewFeature`).
+3. Commit your changes (`git commit -m 'Add NewFeature'`).
+4. Push to your branch (`git push origin feature/NewFeature`).
+5. Create a **Pull Request**.
 
-## 2. 코딩 컨벤션 (Coding Style)
-- **Python**: PEP 8 스타일 가이드를 준수해 주세요.
-- **주석**: 코드의 주요 로직에는 반드시 한글 주석을 달아주세요.
-- **Type Hinting**: 가능한 모든 함수에 타입 힌트를 작성해 주세요.
+## 2. Design & Coding Standards
 
-## 3. 라이선스 (License)
-기여해 주신 모든 코드는 본 프로젝트의 [Apache License 2.0](LICENSE) 하에 배포됩니다.
+### Achromatic Aesthetic
+Sleekes follows a strict achromatic (non-color) design language. 
+- Avoid using colored assets or emojis in the UI or documentation.
+- Use the provided `icons.py` SVG system for all visual indicators.
+- Maintain high contrast and minimalist layouts.
+
+### Implementation
+- **Python**: Adhere to PEP 8 standards.
+- **Type Hinting**: Required for all new functions and classes.
+- **Documentation**: Use clear, technical English or Korean for comments and documentation updates.
+
+## 3. License
+By contributing to this project, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
 
 ---
-감사합니다!
-Rheehose (Rhee Creative) & Sleekes Team
+*Sleekes Development Team*

@@ -1,48 +1,46 @@
-# Sleekes: 초월적 범용 동영상 아카이빙 솔루션
+# SLEEKES: Achromatic Archiving System
 
-**Sleekes**는 `yt-dlp` 엔진의 강력함을 기반으로 설계된 차세대 동영상 아카이빙 솔루션입니다.
-단순히 영상을 다운로드하는 것을 넘어, 영상의 디지털 유산(설명, 메타데이터, 댓글, 자막 등)을 영구적으로 보존하는 데 최적화되어 있습니다.
+**SLEEKES** is a potent, minimalist video archiving solution built on the power of the `yt-dlp` engine. It is designed to secure digital heritage—descriptions, metadata, comments, and subtitles—with a focus on permanence and ultimate purity.
 
-## ✨ 주요 기능 (Sleekes Pro)
+## Key Features
 
-- **초월적 아카이빙**: 영상과 함께 설명(.desc), 메타데이터(.json), 자막(자동생성 포함), 썸네일, 댓글 정보를 한 번에 수집합니다.
-- **안티 밴(Anti-Ban) 시스템**: 채널 전체를 다운로드할 때 유튜브의 IP 차단을 방지하기 위해 지능형 휴식(Sleep) 모드를 가동합니다.
-- **오디오 전문 추출**: 영상 없이 오디오만 필요할 때, 인공지능 후처리를 통해 최고 음질의 MP3로 보관합니다.
-- **쿠키 연동**: 브라우저(Chrome, Edge 등)의 로그인 정보를 가져와 비공개 영상이나 연령 제한 영상도 아카이빙합니다.
-- **데이터 전용 모드**: 용량이 큰 영상은 제외하고, 메타데이터와 댓글만 초고속으로 수집하는 모드를 지원합니다.
-- **글로벌 플랫폼 지원**: 유튜브, 인스타그램(Reels), 틱톡(워터마크 제거), 페이스북 등 수천 개의 플랫폼을 지원합니다.
+- **Achromatic Design Mode**: A high-contrast, distraction-free environment supporting both Pure Dark and Pure Light themes.
+- **SVG Icon System**: All traditional emojis have been replaced with custom-coded SVG icons for a professional, consistent aesthetic.
+- **403 Forbidden Protection**: Advanced anti-bot measures including Android/iOS client emulation and intelligent User-Agent rotation.
+- **Precision Sleep Engine**: Configurable minute-based sleep intervals (e.g., 5m to 30m random range) to bypass the most aggressive IP blocks.
+- **Complete Archiving**: Secures descriptions (.desc), metadata (.json), high-quality thumbnails, and all comments in a single session.
+- **Audio Specialist Mode**: Extracts the highest fidelity audio streams with AI-enhanced post-processing to MP3 format.
+- **Global Platform Support**: Securely archives content from YouTube, Instagram, TikTok, Facebook, and thousands of other platforms.
 
-## 🚀 설치 및 사용법
+## Installation & Execution
 
-### 1. 실행 방법
-**자동 실행 (추천)**
-터미널에서 제공된 스크립트를 실행하면 가상환경 설정부터 실행까지 한 번에 처리합니다.
+### 1. Quick Start
+Run the provided shell script to automatically configure the virtual environment and launch the system.
 ```bash
 ./run.sh
 ```
 
-**수동 실행**
+### 2. Manual Execution
 ```bash
-# 가상환경 활성화
+# Activate environment
 source venv/bin/activate
 
-# GUI 모드 실행
+# Launch Achromatic GUI
 python main.py
 
-# CLI 모드 실행
+# CLI Mode Execution
 python main.py [URL] --rec
 ```
 
-## 🛠 CLI 명령어 가이드
-터미널 환경에서도 GUI와 동일한 강력한 기능을 제공합니다.
+## CLI Command Guide
 
-- **권장 설정으로 받기 (추천)**: `python main.py [URL] --rec`
-- **오디오만 추출**: `python main.py [URL] -x`
-- **채널 전체 안전하게 받기**: `python main.py [URL] --archive --sleep 5`
-- **도움말 보기**: `python main.py help`
+- **Recommended Mode (Secure)**: `python main.py [URL] --rec`
+- **Audio Extraction**: `python main.py [URL] -x`
+- **Safe Full Archive**: `python main.py [URL] --archive --sleep 5`
+- **Help/Manual**: `python main.py help`
 
-## 📝 라이선스
-MIT License
+## License
+Licensed under the [Apache License 2.0](LICENSE).
 
 ---
-*Created by Antigravity for Archivists.*
+*Developed by Antigravity. Potent . Pure . Permanent.*
