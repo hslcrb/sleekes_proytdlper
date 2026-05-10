@@ -171,6 +171,7 @@ class SleekesMainWindow(QMainWindow):
         self.max_sleep_label.setText(t["max_sleep"])
         self.cookie_label.setText(t["auth_cookies"])
         self.flat_output_cb.setText(t["opt_flat"])
+        self.default_path_cb.setText(t["opt_default_path"])
         self.run_btn.setText(t["btn_execute"])
         
         # Metadata Tab (JSON Viewer)
@@ -210,6 +211,11 @@ class SleekesMainWindow(QMainWindow):
         self.path_btn.clicked.connect(self.select_path)
         path_box.addWidget(self.path_input)
         path_box.addWidget(self.path_btn)
+        
+        self.default_path_cb = QCheckBox()
+        self.default_path_cb.toggled.connect(self.toggle_path_edit)
+        path_box.addWidget(self.default_path_cb)
+        
         layout.addLayout(path_box)
 
         self.opt_group = QGroupBox()
@@ -293,11 +299,24 @@ class SleekesMainWindow(QMainWindow):
 
     def select_path(self):
         current_path = self.path_input.text() or os.path.join(os.getcwd(), "Archives")
-        path = QFileDialog.getExistingDirectory(self, "Select Archive Directory", current_path)
+        # 내부적으로는 절대 경로로 열되, 표시는 상대 경로로
+        path = QFileDialog.getExistingDirectory(self, "Select Archive Directory", os.path.abspath(current_path))
         if path:
-            # 상대 경로로 변환 (현재 작업 디렉토리 기준)
+            # 강제로 상대 경로로 변환 (현재 작업 디렉토리 기준)
             rel_path = os.path.relpath(path, os.getcwd())
-            self.path_input.setText(rel_path)
+            # 절대 경로가 포함되어 보이지 않도록 필터링 (예: C:\... -> Archives)
+            if rel_path.startswith(".."):
+                # 부모 디렉토리로 나가는 경우도 상대적으로 유지하되, 절대경로 문자는 절대 비노출
+                self.path_input.setText(rel_path)
+            else:
+                self.path_input.setText(rel_path)
+
+    def toggle_path_edit(self, checked):
+        """기본 경로 사용 체크 시 입력창 비활성화"""
+        self.path_input.setEnabled(not checked)
+        self.path_btn.setEnabled(not checked)
+        if checked:
+            self.path_input.setText("Archives")
 
     def toggle_archive_options(self, checked):
         for cb in [self.desc_cb, self.json_cb, self.subs_cb, self.thumb_cb, self.comments_cb]:
@@ -328,6 +347,8 @@ class SleekesMainWindow(QMainWindow):
             except: pass
             
         self.path_input.setText(s.get("last_path", default_archive))
+        self.default_path_cb.setChecked(s.get("use_default_path", True))
+        self.toggle_path_edit(self.default_path_cb.isChecked())
 
     def save_current_settings(self):
         try: sleep_min = float(self.sleep_input.text())
@@ -345,6 +366,7 @@ class SleekesMainWindow(QMainWindow):
             "cookie_browser": self.cookie_browser.currentText(),
             "flat_output": self.flat_output_cb.isChecked(),
             "last_path": self.path_input.text(),
+            "use_default_path": self.default_path_cb.isChecked(),
             "language": self.current_lang
         })
         save_settings(self.settings)
