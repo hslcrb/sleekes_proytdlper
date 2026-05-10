@@ -67,3 +67,5 @@ Desktop.ini
 
 # User-specific files
 *.local
+settings/config.json
+config.json
