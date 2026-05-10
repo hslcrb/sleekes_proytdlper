@@ -60,5 +60,33 @@ def save_settings(settings):
         os.makedirs(SETTINGS_DIR)
         
     with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
-        # indent=4로 저장하여 사람도 읽고 수정하기 편하게 함
         json.dump(settings, f, indent=4, ensure_ascii=False)
+
+def get_next_counter():
+    """
+    YYYYMMDD_XXXX 형식의 XXXX를 위한 일일 카운터를 관리합니다.
+    날짜가 바뀌면 1로 초기화됩니다.
+    """
+    counter_file = os.path.join(SETTINGS_DIR, "counters.json")
+    from datetime import datetime
+    today = datetime.now().strftime("%Y%m%d")
+    
+    data = {"date": today, "count": 0}
+    if os.path.exists(counter_file):
+        try:
+            with open(counter_file, "r", encoding="utf-8") as f:
+                saved = json.load(f)
+                if saved.get("date") == today:
+                    data = saved
+        except:
+            pass
+            
+    data["count"] += 1
+    
+    if not os.path.exists(SETTINGS_DIR):
+        os.makedirs(SETTINGS_DIR)
+        
+    with open(counter_file, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+        
+    return f"{data['count']:04d}"

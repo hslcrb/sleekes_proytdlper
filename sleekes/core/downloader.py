@@ -24,22 +24,62 @@ class SleekesDownloader:
                 self.log_callback("DONE: Asset secured. Processing...")
 
     def download(self, url: str, output_path: str, options: dict):
-        out_tmpl = os.path.join(output_path, '%(uploader)s/%(upload_date)s - %(title)s/%(title)s.%(ext)s')
-        if options.get('flat_output', False):
-            out_tmpl = os.path.join(output_path, '%(title)s.%(ext)s')
+        from datetime import datetime
+        from sleekes.core.config import get_next_counter
+        
+        # 1. 메타데이터 먼저 추출하여 폴더명 결정
+        if self.log_callback:
+            self.log_callback("ENGINE: Extracting metadata to determine folder structure...")
+        
+        info = self.get_info(url)
+        if not info:
+            if self.log_callback:
+                self.log_callback("ERROR: Failed to extract metadata. Aborting.")
+            return False
+
+        # 채널명 및 동영상명 추출
+        uploader = info.get('uploader') or info.get('channel') or 'UnknownChannel'
+        title = info.get('title') or 'UnknownTitle'
+        
+        # 재생목록/채널인 경우
+        is_playlist = 'entries' in info
+        if is_playlist:
+            # 채널 다운로드 시: 채널명_채널명
+            folder_suffix = f"{uploader}_{uploader}"
+        else:
+            # 일반 동영상: 채널명_동영상명
+            folder_suffix = f"{uploader}_{title}"
+
+        # 특수문자 제거 (파일명 안전하게)
+        import re
+        folder_suffix = re.sub(r'[\\/*?:"<>|]', "", folder_suffix)
+        
+        today = datetime.now().strftime("%Y%m%d")
+        xxxx = get_next_counter()
+        
+        # 최종 폴더명: YYYYMMDD_XXXX_채널명_동영상명
+        final_folder_name = f"{today}_{xxxx}_{folder_suffix}"
+        full_output_dir = os.path.join(output_path, final_folder_name)
+        
+        if not os.path.exists(full_output_dir):
+            os.makedirs(full_output_dir)
+
+        # 템플릿 설정: 모든 파일을 이 하나의 폴더 안에 때려박음
+        out_tmpl = os.path.join(full_output_dir, '%(title)s.%(ext)s')
 
         # yt-dlp 옵션 구성
         ydl_opts = {
             'progress_hooks': [self._progress_hook],
             'outtmpl': out_tmpl,
             
-            # --- 아카이빙 및 메타데이터 관련 ---
-            'writedescription': options.get('write_description', False) or options.get('archive_mode', False),
-            'writeinfojson': options.get('write_info_json', False) or options.get('archive_mode', False),
-            'writesubtitles': options.get('write_subs', False) or options.get('archive_mode', False),
-            'getcomments': options.get('get_comments', False) or options.get('archive_mode', False),
-            'writeautomaticcaption': options.get('write_auto_subs', False) or options.get('archive_mode', False),
-            'writethumbnail': options.get('write_thumbnail', False) or options.get('archive_mode', False),
+            # --- [강력한 아카이빙 지원: 모든 기능 활성화] ---
+            'writedescription': True,
+            'writeinfojson': True,
+            'writesubtitles': True,
+            'getcomments': True,
+            'writeautomaticcaption': True,
+            'writethumbnail': True,
+            'allsubtitles': True, # 모든 언어 자막
             
             'postprocessors': [],
             
@@ -55,7 +95,7 @@ class SleekesDownloader:
             'geo_bypass': True,
             'no_warnings': True,
             
-            # 클라이언트 플랫폼 분산 (웹 대신 모바일 클라이언트 위주로 요청하여 403 우회)
+            # 클라이언트 플랫폼 분산
             'extractor_args': {
                 'youtube': {
                     'player_client': ['android', 'ios', 'web_safari'],
@@ -75,9 +115,9 @@ class SleekesDownloader:
             'Referer': 'https://www.google.com/',
         }
 
-        # 스텔스 모드 (속도 제한 및 지연 강화)
+        # 스텔스 모드
         if options.get('stealth_mode', False):
-            ydl_opts['ratelimit'] = 1024 * 512 # 512KB/s로 제한 (봇 탐지 회피용)
+            ydl_opts['ratelimit'] = 1024 * 512
             if ydl_opts['sleep_interval'] == 0:
                 ydl_opts['sleep_interval'] = 15
                 ydl_opts['max_sleep_interval'] = 45
@@ -101,11 +141,11 @@ class SleekesDownloader:
         if not options.get('use_playlist', True):
             ydl_opts['noplaylist'] = True
 
-        if ydl_opts['writesubtitles'] or ydl_opts['writeautomaticcaption']:
-            ydl_opts['postprocessors'].append({
-                'key': 'FFmpegSubtitlesConvertor',
-                'format': 'srt',
-            })
+        # 자막 변환기
+        ydl_opts['postprocessors'].append({
+            'key': 'FFmpegSubtitlesConvertor',
+            'format': 'srt',
+        })
 
         if options.get('cookies_from_browser'):
             ydl_opts['cookiesfrombrowser'] = (options.get('cookies_from_browser'),)
@@ -114,13 +154,13 @@ class SleekesDownloader:
             ydl_opts['skip_download'] = True
 
         if self.log_callback:
-            self.log_callback(f"ENGINE START: {url}")
+            self.log_callback(f"ENGINE START: Targeting {final_folder_name}")
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
             if self.log_callback:
-                self.log_callback("SUCCESS: Archiving session completed.")
+                self.log_callback(f"SUCCESS: Archiving session completed in {final_folder_name}")
             return True
         except Exception as e:
             if self.log_callback:

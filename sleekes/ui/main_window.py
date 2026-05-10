@@ -6,7 +6,6 @@ from PySide6.QtGui import QIcon, QFont, QAction
 from sleekes.core.downloader import SleekesDownloader
 from sleekes.core.config import load_settings, save_settings
 from sleekes.ui import styles, icons, i18n
-from sleekes.ui.json_viewer import JsonViewerWidget
 from sleekes.ui.guide_view import GuideViewWidget
 import os
 
@@ -112,11 +111,9 @@ class SleekesMainWindow(QMainWindow):
         # --- [Tab System] ---
         self.tabs = QTabWidget()
         self.tab_downloader = self.create_downloader_tab()
-        self.tab_metadata = JsonViewerWidget()
         self.tab_guide = GuideViewWidget()
         
         self.tabs.addTab(self.tab_downloader, "Downloader")
-        self.tabs.addTab(self.tab_metadata, "Metadata")
         self.tabs.addTab(self.tab_guide, "Reference")
         
         main_layout.addWidget(self.tabs)
@@ -144,8 +141,7 @@ class SleekesMainWindow(QMainWindow):
         
         # Nav & Header
         self.tabs.setTabText(0, t["nav_downloader"])
-        self.tabs.setTabText(1, t["nav_metadata"])
-        self.tabs.setTabText(2, t["nav_guide"])
+        self.tabs.setTabText(1, t["nav_guide"])
         self.mode_label.setText(t["design_mode"])
         self.lang_label.setText(t["lang_mode"])
         self.guide_nav_btn.setText(t["btn_guide"])
@@ -174,10 +170,6 @@ class SleekesMainWindow(QMainWindow):
         self.default_path_cb.setText(t["opt_default_path"])
         self.run_btn.setText(t["btn_execute"])
         
-        # Metadata Tab (JSON Viewer)
-        if hasattr(self.tab_metadata, "update_language"):
-            self.tab_metadata.update_language(lang_code)
-            
         # Reference Tab (Guide)
         if hasattr(self, "tab_guide"):
             self.tab_guide.update_language(lang_code)
@@ -188,8 +180,7 @@ class SleekesMainWindow(QMainWindow):
 
     def update_icons(self, color):
         self.tabs.setTabIcon(0, icons.svg_to_icon(icons.ICON_DOWNLOAD_CENTER, color))
-        self.tabs.setTabIcon(1, icons.svg_to_icon(icons.ICON_METADATA_VIEWER, color))
-        self.tabs.setTabIcon(2, icons.svg_to_icon(icons.ICON_GUIDE, color))
+        self.tabs.setTabIcon(1, icons.svg_to_icon(icons.ICON_GUIDE, color))
         self.tabs.setIconSize(QSize(22, 22))
         self.rec_btn.setIcon(icons.svg_to_icon(icons.ICON_RECOMMENDED, color))
         self.guide_nav_btn.setIcon(icons.svg_to_icon(icons.ICON_GUIDE, color))

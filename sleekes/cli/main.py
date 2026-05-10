@@ -16,8 +16,7 @@ from sleekes.core.config import load_settings, save_settings
 # 1. 명령어 인자 파싱 (argparse 사용)
 # 2. 도움말 및 가이드 출력
 # 3. 사용자 설정 로드 및 저장
-# 4. JSON 뷰어 모드 실행
-# 5. 다운로드 작업 실행 및 결과 리포트
+# 4. 다운로드 작업 실행 및 결과 리포트
 # =============================================================================
 
 def print_guide():
@@ -59,9 +58,14 @@ Sleekes는 yt-dlp를 기반으로 한 강력한 동영상 아카이빙 솔루션
 
 [옵션 상세 설명]
 
+- **정밀 휴식 엔진**: 분 단위 랜덤 지연(5분~30분)을 통해 기계적 접근 탐지를 완벽히 우회.
+- **풀 스펙트럼 아카이빙**: 영상, 설명, 메타데이터(JSON), 자막, 계층형 댓글 트리를 단번에 보존 (모든 기능 기본 활성화).
+- **일일 카운터 폴더 시스템**: `YYYYMMDD_XXXX_채널명_동영상명` 형식의 폴더명을 통해 체계적인 데이터 분류 지원.
+- **철저한 상대 경로 시스템**: 모든 경로는 프로젝트 루트 기준 상대 경로로만 처리되며, UI상에서 절대경로 노출을 원천 차단.
+- **경로 잠금 시스템**: '기본 경로 사용' 체크박스를 통해 `Archives` 디렉토리에 정갈하게 데이터 축적 가능.
+
   --rec          : 권장 설정 적용 (전체 아카이빙 + 5초 휴식)
   --save         : 현재 입력한 옵션(경로, 쿠키 등)을 기본값으로 저장
-  --view [파일]  : .json 메타데이터 파일을 보기 좋게 출력
   --info         : 이 도움말 화면을 출력
 
   -a, --archive  : 전체 아카이빙 모드 (영상+모든 데이터)
@@ -73,24 +77,6 @@ Sleekes는 yt-dlp를 기반으로 한 강력한 동영상 아카이빙 솔루션
 
 ================================================================
 """)
-
-def view_json(path):
-    """
-    JSON 파일을 사람이 읽기 편한 형태(Pretty Print)로 터미널에 출력합니다.
-    
-    Args:
-        path (str): 읽을 JSON 파일의 경로
-    """
-    if not os.path.exists(path):
-        print(f"[오류] 파일을 찾을 수 없습니다: {path}")
-        return
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        # indent=4를 사용하여 들여쓰기를 적용, 가독성을 높입니다.
-        print(json.dumps(data, indent=4, ensure_ascii=False))
-    except Exception as e:
-        print(f"[오류] 파일을 읽는 중 문제가 발생했습니다: {str(e)}")
 
 def main():
     """
@@ -121,7 +107,6 @@ def main():
     # [특수 모드 그룹]
     mode_group = parser.add_argument_group('특수 모드')
     mode_group.add_argument("--info", action="store_true", help="지원 플랫폼 및 상세 사용 가이드 출력")
-    mode_group.add_argument("--view", action="store_true", help="JSON 파일 뷰어 모드 실행 (URL 자리에 파일 경로 입력)")
     mode_group.add_argument("--rec", action="store_true", help="✨ 권장 설정 적용 (전체 아카이빙 + 5초 휴식 + 안전 모드)")
     mode_group.add_argument("--save", action="store_true", help="현재 입력한 옵션을 다음 실행 시 기본값으로 저장")
 
@@ -175,16 +160,7 @@ def main():
         print_guide()
         return
 
-    # 2. JSON 뷰어 모드
-    if args.view:
-        if not args.url:
-            print("[오류] --view 옵션 사용 시, 분석할 JSON 파일의 경로를 입력해 주세요.")
-            print("예: python main.py video_info.json --view")
-        else:
-            view_json(args.url)
-        return
-
-    # 3. URL 유효성 확인
+    # 2. URL 유효성 확인
     if not args.url:
         parser.print_help() # URL이 없으면 기본 도움말 출력
         return
@@ -216,6 +192,10 @@ def main():
 
     # 6. 최종 옵션 딕셔너리 생성
     # Downloader 클래스에 전달할 통합 옵션 객체를 만듭니다.
+    # - Full Spectrum Archiving: Secures video, description, metadata (JSON), subtitles, and nested comment trees. (All features enabled by default)
+    # - Daily Counter Naming Convention: Folders are named YYYYMMDD_XXXX_Channel_Title for clarity and organization.
+    # - Absolute Privacy (Strict Relative Paths): All path management is strictly relative to the project root. Absolute paths are never displayed or stored.
+    # - Path Locking System: One-click "Default Path" locking to ensure data consistency in the Archives directory.
     options = {
         'write_description': args.desc or args.archive,
         'write_info_json': args.json or args.archive,

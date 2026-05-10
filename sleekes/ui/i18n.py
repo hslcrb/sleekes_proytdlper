@@ -99,7 +99,6 @@ KO_CONTENT = """
 TRANSLATIONS = {
     "EN": {
         "nav_downloader": "Downloader",
-        "nav_metadata": "Metadata",
         "nav_guide": "Reference",
         "design_mode": "DESIGN MODE:",
         "lang_mode": "LANGUAGE:",
@@ -133,7 +132,6 @@ TRANSLATIONS = {
     },
     "KO": {
         "nav_downloader": "다운로더",
-        "nav_metadata": "메타데이터",
         "nav_guide": "레퍼런스",
         "design_mode": "디자인 모드:",
         "lang_mode": "언어 설정:",
