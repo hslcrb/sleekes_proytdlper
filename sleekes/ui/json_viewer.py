@@ -196,6 +196,7 @@ class JsonViewerWidget(QWidget):
                 </div>
                 """
 
+        description_html = html.escape(data.get('description', '')[:1000]).replace('\n', '<br>')
         return f"""
         <style>
             body {{ color: #ffffff; background-color: #000000; font-family: sans-serif; line-height: 1.5; padding: 20px; }}
@@ -205,6 +206,6 @@ class JsonViewerWidget(QWidget):
         </style>
         <h1>{html.escape(title)}</h1>
         <div class="meta">{uploader_label}: {uploader}</div>
-        <div class="box">{html.escape(data.get('description', '')[:1000]).replace('\n', '<br>')}...</div>
+        <div class="box">{description_html}...</div>
         {comments_html}
         """
