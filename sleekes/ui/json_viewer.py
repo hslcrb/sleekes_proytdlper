@@ -47,6 +47,7 @@ class JsonViewerWidget(QWidget):
         self.current_file_path = None
         self.current_data = None
         self.current_lang = "EN"
+        self.current_theme = "Dark"
         self.init_ui()
 
     def init_ui(self):
@@ -105,6 +106,19 @@ class JsonViewerWidget(QWidget):
         self.stack.addWidget(self.editor)
         
         layout.addWidget(self.stack)
+
+    def update_theme(self, theme_name):
+        """테마에 따라 HTML 스타일 및 소스 뷰어 스타일 업데이트"""
+        self.current_theme = theme_name
+        # 테마 변경 시 현재 데이터를 다시 렌더링하여 반영
+        if self.current_data:
+            if isinstance(self.current_data, dict):
+                html_content = self.render_json_to_html(self.current_data)
+            else:
+                html_content = self.render_text_to_html(str(self.current_data))
+            self.browser.setHtml(html_content)
+            
+        # 소스 에디터 스타일도 필요시 조정 가능 (현재는 Achromatic 유지)
 
     def update_language(self, lang_code):
         """다국어 지원 레이블 업데이트"""
@@ -165,10 +179,35 @@ class JsonViewerWidget(QWidget):
     def render_text_to_html(self, text):
         safe_text = html.escape(text).replace('\n', '<br>')
         title = "DESCRIPTION" if self.current_lang == "EN" else "상세 설명"
+        
+        is_dark = (self.current_theme == "Dark")
+        bg = "#000000" if is_dark else "#ffffff"
+        fg = "#ffffff" if is_dark else "#000000"
+        sel_bg = "#ffffff" if is_dark else "#000000"
+        sel_fg = "#000000" if is_dark else "#ffffff"
+        border = "#333333" if is_dark else "#cccccc"
+
         return f"""
         <style>
-            body {{ color: #ffffff; background-color: #000000; font-family: sans-serif; line-height: 1.6; padding: 20px; }}
-            .box {{ border: 1px solid #333333; padding: 15px; border-radius: 4px; }}
+            :root {{
+                --bg-color: {bg};
+                --text-color: {fg};
+                --selection-bg: {sel_bg};
+                --selection-text: {sel_fg};
+                --box-border: {border};
+            }}
+            body {{ 
+                color: var(--text-color); 
+                background-color: var(--bg-color); 
+                font-family: sans-serif; 
+                line-height: 1.6; 
+                padding: 20px; 
+            }}
+            ::selection {{
+                background: var(--selection-bg);
+                color: var(--selection-text);
+            }}
+            .box {{ border: 1px solid var(--box-border); padding: 15px; border-radius: 4px; }}
         </style>
         <h3>{title}</h3>
         <div class="box">{safe_text}</div>
@@ -196,13 +235,41 @@ class JsonViewerWidget(QWidget):
                 </div>
                 """
 
+        is_dark = (self.current_theme == "Dark")
+        bg = "#000000" if is_dark else "#ffffff"
+        fg = "#ffffff" if is_dark else "#000000"
+        sel_bg = "#ffffff" if is_dark else "#000000"
+        sel_fg = "#000000" if is_dark else "#ffffff"
+        border = "#333333" if is_dark else "#cccccc"
+        meta = "#888888"
+        h_border = "#ffffff" if is_dark else "#000000"
+
         description_html = html.escape(data.get('description', '')[:1000]).replace('\n', '<br>')
         return f"""
         <style>
-            body {{ color: #ffffff; background-color: #000000; font-family: sans-serif; line-height: 1.5; padding: 20px; }}
-            h1 {{ border-bottom: 2px solid #ffffff; padding-bottom: 10px; font-size: 24px; }}
-            .meta {{ color: #888; font-size: 12px; margin-bottom: 20px; }}
-            .box {{ border: 1px solid #333; padding: 15px; margin-bottom: 20px; }}
+            :root {{
+                --bg-color: {bg};
+                --text-color: {fg};
+                --selection-bg: {sel_bg};
+                --selection-text: {sel_fg};
+                --box-border: {border};
+                --meta-color: {meta};
+                --header-border: {h_border};
+            }}
+            body {{ 
+                color: var(--text-color); 
+                background-color: var(--bg-color); 
+                font-family: sans-serif; 
+                line-height: 1.5; 
+                padding: 20px; 
+            }}
+            ::selection {{
+                background: var(--selection-bg);
+                color: var(--selection-text);
+            }}
+            h1 {{ border-bottom: 2px solid var(--header-border); padding-bottom: 10px; font-size: 24px; }}
+            .meta {{ color: var(--meta-color); font-size: 12px; margin-bottom: 20px; }}
+            .box {{ border: 1px solid var(--box-border); padding: 15px; margin-bottom: 20px; }}
         </style>
         <h1>{html.escape(title)}</h1>
         <div class="meta">{uploader_label}: {uploader}</div>

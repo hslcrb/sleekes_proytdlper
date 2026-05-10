@@ -128,7 +128,9 @@ class SleekesMainWindow(QMainWindow):
         
         self.update_icons(icon_color)
         
-        # Guide Theme Sync
+        # Tab Themes Sync
+        if hasattr(self, "tab_metadata"):
+            self.tab_metadata.update_theme(theme_name)
         if hasattr(self, "tab_guide"):
             self.tab_guide.update_theme(theme_name)
             
@@ -290,8 +292,12 @@ class SleekesMainWindow(QMainWindow):
         return tab
 
     def select_path(self):
-        path = QFileDialog.getExistingDirectory(self, "Select Archive Directory", self.path_input.text())
-        if path: self.path_input.setText(path)
+        current_path = self.path_input.text() or os.path.join(os.getcwd(), "Archives")
+        path = QFileDialog.getExistingDirectory(self, "Select Archive Directory", current_path)
+        if path:
+            # 상대 경로로 변환 (현재 작업 디렉토리 기준)
+            rel_path = os.path.relpath(path, os.getcwd())
+            self.path_input.setText(rel_path)
 
     def toggle_archive_options(self, checked):
         for cb in [self.desc_cb, self.json_cb, self.subs_cb, self.thumb_cb, self.comments_cb]:
@@ -315,7 +321,13 @@ class SleekesMainWindow(QMainWindow):
         idx = self.cookie_browser.findText(s.get("cookie_browser", "None"))
         if idx >= 0: self.cookie_browser.setCurrentIndex(idx)
         self.flat_output_cb.setChecked(s.get("flat_output", False))
-        self.path_input.setText(s.get("last_path", os.getcwd()))
+        
+        default_archive = os.path.join("Archives")
+        if not os.path.exists(default_archive):
+            try: os.makedirs(default_archive)
+            except: pass
+            
+        self.path_input.setText(s.get("last_path", default_archive))
 
     def save_current_settings(self):
         try: sleep_min = float(self.sleep_input.text())
